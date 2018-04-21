@@ -1,8 +1,11 @@
 CC=gcc
 LD=gcc
-CFLAGS=-O0 -Wall -pedantic -Wno-format
+GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-3.0`
+CFLAGS=-DPATH_TO_GLADE="\"./resources/gui_layout.glade\"" -O0 -Wall -pedantic -Wno-format $(GTKFLAGS)
+LFLAGS=$(GTKFLAGS)
 LIBS=-pthread
 DEPS=
+SRCDIR=src
 
 all: tags main
 
@@ -16,7 +19,7 @@ OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 $(OBJDIR):
 	mkdir $(OBJDIR) || true
 
-$(OBJDIR)/%.o: %.c $(OBJDIR) $(DEPS)
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(OBJDIR) $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 main: $(OBJ)
