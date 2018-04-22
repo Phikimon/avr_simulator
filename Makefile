@@ -23,7 +23,7 @@ obj/%.o: src/%.c $(OBJDIR) $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 main: $(OBJ)
-	$(LD) $(LFLAGS) $(LIBS) $^ -o $@
+	$(LD) $^ $(LFLAGS) $(LIBS) -o $@
 
 clean:
 	rm -rf $(OBJDIR) || true
