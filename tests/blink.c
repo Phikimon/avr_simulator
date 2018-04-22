@@ -3,7 +3,6 @@
 #endif
 
 #include <avr/io.h>
-#include <util/delay.h>
 
 int main(void)
 {
@@ -11,12 +10,6 @@ int main(void)
     while(1) //infinite loop
     {
         PORTB = 0xFF; //Turns ON All LEDs
-#ifdef DELAY
-        _delay_ms(1000); //1 second delay
-#endif
         PORTB= 0x00; //Turns OFF All LEDs
-#ifdef DELAY
-        _delay_ms(1000); //1 second delay
-#endif
     }
 }
