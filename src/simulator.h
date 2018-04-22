@@ -1,3 +1,5 @@
+#ifndef SIMULATOR_H
+#define SIMULATOR_H
 
 struct simulator {
     uint64_t        tick;
@@ -5,3 +7,5 @@ struct simulator {
     struct attiny13 chip;
 
 }
+
+#endif
