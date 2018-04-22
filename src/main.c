@@ -1,5 +1,6 @@
+#include "gui.h"
+#include "attiny13.h"
 #include <stdio.h>
-#include <gui.h>
 
 int main(int argc, char *argv[])
 {
