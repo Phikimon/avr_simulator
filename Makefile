@@ -10,6 +10,8 @@ all: tags main
 
 DEPDIR = src
 _DEPS = gui_callbacks.h gui.h mc.h
+_SRCS  = gui_callbacks.c gui.c mc.c main.c
+SRCS = $(patsubst %,$(SRCDIR)/%,$(_SRCS))
 DEPS = $(patsubst %,$(DEPDIR)/%,$(_DEPS))
 
 OBJDIR=obj
@@ -29,5 +31,5 @@ clean:
 	rm -rf $(OBJDIR) || true
 	rm tags main || true
 
-tags:
+tags: $(SRCS) $(DEPS)
 	ctags -R
