@@ -1,13 +1,9 @@
 #ifndef ATTINY13_H
 #define ATTINY13_H
-#include "enums.h"
+#include "common.h"
 #include <stdint.h>
 
 struct attiny13 {
-/* Public  */
-    enum pin_state pin_values[PIN_NUM];
-    uint16_t       adc_value;
-/* Private */
     /*
        Data Memory:
        1. 32 general purpose registers
@@ -21,8 +17,9 @@ struct attiny13 {
        name as variables
        3. SRAM - 'sram' pointer
      */
-    uint8_t* data_memory, *io_registers;
-    uint8_t  registers[REGISTERS_NUM];
+    int8_t* data_memory;
+    uint8_t* io_registers;
+    int8_t  registers[REGISTERS_NUM];
 
 #define IO_REGISTER(NAME, OFFSET) \
     uint8_t  NAME;
@@ -34,11 +31,61 @@ struct attiny13 {
 #undef IO_REGISTER
 #undef RESERVED_REGISTER
 
-    uint8_t  sram[SRAM_SIZE];
+    int8_t  sram[SRAM_SIZE];
     /* Data Memory end */
 
     /* Flash memory: 1024 bytes */
-    uint8_t  flash_memory[FLASH_MEMORY_SIZE];
+    int8_t  flash_memory[FLASH_MEMORY_SIZE];
+    uint16_t PC;
 };
+
+struct cmd {
+    union cmd_args {
+        int8_t arg[2];
+        uint16_t addr;
+    } args;
+    int progress;
+    int is_finished;
+    int (*func)(struct attiny13* chip, struct cmd* instr);
+};
+
+/* Public */
+    int attiny13_ctor           (struct attiny13* chip);
+    int execute_cycle           (struct attiny13* chip);
+/* Private */
+    int check_interrupt         (struct attiny13* chip, struct cmd* instr);
+    int refresh_interrupt_flags (struct attiny13* chip);
+    int decode                  (struct attiny13* chip, struct cmd* instr, int16_t cmd);
+    int do_HANDLE_INTERRUPT     (struct attiny13* chip, struct cmd* instr);
+    int attiny13_push_pc        (struct attiny13* chip);
+    int attiny13_call_handler   (struct attiny13* chip, uint8_t addr);
+
+
+int do_IN   (struct attiny13* chip, struct cmd* instr);
+int do_OUT  (struct attiny13* chip, struct cmd* instr);
+
+int do_CBI  (struct attiny13* chip, struct cmd* instr);
+int do_SBIS (struct attiny13* chip, struct cmd* instr);
+
+int do_AND  (struct attiny13* chip, struct cmd* instr);
+int do_ADD  (struct attiny13* chip, struct cmd* instr);
+int do_SUB  (struct attiny13* chip, struct cmd* instr);
+int do_CP   (struct attiny13* chip, struct cmd* instr);
+int do_MOV  (struct attiny13* chip, struct cmd* instr);
+
+int do_PUSH (struct attiny13* chip, struct cmd* instr);
+int do_POP  (struct attiny13* chip, struct cmd* instr);
+
+int do_BREQ (struct attiny13* chip, struct cmd* instr);
+int do_BRNE (struct attiny13* chip, struct cmd* instr);
+int do_BRGE (struct attiny13* chip, struct cmd* instr);
+
+int do_CPI  (struct attiny13* chip, struct cmd* instr);
+int do_LDI  (struct attiny13* chip, struct cmd* instr);
+
+int do_NOP  (struct attiny13* chip, struct cmd* instr);
+int do_RET  (struct attiny13* chip, struct cmd* instr);
+int do_RETI (struct attiny13* chip, struct cmd* instr);
+
 
 #endif

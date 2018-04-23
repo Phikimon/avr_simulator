@@ -9,13 +9,13 @@ SRCDIR=src
 all: tags main
 
 DEPDIR = src
-_SRCS  = gui_callbacks.c gui.c attiny13.c main.c
 _DEPS = gui_callbacks.h gui.h attiny13.h common.h decode.h
+_SRCS  = gui_callbacks.c gui.c attiny13.c main.c do_functions.c
 SRCS = $(patsubst %,$(SRCDIR)/%,$(_SRCS))
 DEPS = $(patsubst %,$(DEPDIR)/%,$(_DEPS))
 
 OBJDIR=obj
-_OBJ = main.o gui.o gui_callbacks.o attiny13.o
+_OBJ = main.o gui.o gui_callbacks.o attiny13.o do_functions.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
 $(OBJDIR):
