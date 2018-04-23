@@ -9,8 +9,8 @@ SRCDIR=src
 all: tags main
 
 DEPDIR = src
-_DEPS = gui_callbacks.h gui.h attiny13.h
 _SRCS  = gui_callbacks.c gui.c attiny13.c main.c
+_DEPS = gui_callbacks.h gui.h attiny13.h decode.h
 SRCS = $(patsubst %,$(SRCDIR)/%,$(_SRCS))
 DEPS = $(patsubst %,$(DEPDIR)/%,$(_DEPS))
 
