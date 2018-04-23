@@ -38,4 +38,15 @@ enum ERR {
     ERR_INVALID_OPCODE
 };
 
+enum SREG_BITS {
+    SREG_C = 0,
+    SREG_Z = 1,
+    SREG_N = 2,
+    SREG_V = 3,
+    SREG_S = 4,
+    SREG_H = 5,
+    SREG_T = 6,
+    SREG_I = 7
+};
+
 #endif
