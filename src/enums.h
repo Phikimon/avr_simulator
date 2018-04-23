@@ -32,4 +32,10 @@ enum { NAME##_OFFSET = OFFSET };
 #undef RESERVED_REGISTER
 #undef IO_REGISTER
 
+enum ERR {
+    ERR_SUCCESS = 0,
+    ERR_INTERRUPT,
+    ERR_INVALID_OPCODE
+};
+
 #endif
