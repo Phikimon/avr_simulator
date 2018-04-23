@@ -1,12 +1,23 @@
-#ifndef ENUMS_H
-#define ENUMS_H
+#ifndef COMMON_H
+#define COMMON_H
 
-enum pin_state {
-    PIN_LOW = 0,
-    PIN_HIGH,
+#define GET_PIN_VALUE(PIN_NUM) ((enum PIN_STATE)((chip->PINB >> PIN_NUM) & 1))
+#define _BV(n) (1 << n)
+
+enum PIN_STATE {
+    PIN_LOW  = 0,
+    PIN_HIGH = 1,
     PIN_HI_Z,
 };
 
+enum PINS {
+    PB0 = 0,
+    PB1 = 1,
+    PB2 = 2,
+    PB3 = 3,
+    PB4 = 4,
+    PB5 = 5
+};
 
 // SIZES CONSTANTS
 enum { REGISTERS_NUM       = 32 }; // 0x20
@@ -15,6 +26,7 @@ enum { SRAM_SIZE           = 64 }; // 0x40
 enum { DATA_MEMORY_SIZE    = REGISTERS_NUM    +
                              IO_REGISTERS_NUM +
                              SRAM_SIZE };
+enum { PIN_INT0 = PB1 };
 enum { FLASH_MEMORY_SIZE   = 0x0200 }; // 1024
 enum { PIN_NUM             = 6 };
 // OFFSETS CONSTANTS
@@ -23,14 +35,24 @@ enum { IO_REGISTERS_OFFSET = REGISTERS_NUM };
 enum { SRAM_OFFSET         = REGISTERS_NUM    +
                              IO_REGISTERS_NUM };
 
-#define IO_REGISTER(NAME, OFFSET) \
-enum { NAME##_OFFSET = OFFSET };
+enum IO_REGISTER_OFFSET {
 #define RESERVED_REGISTER(OFFSET)
+#define IO_REGISTER(NAME, OFFSET) \
+    NAME##_OFFSET = OFFSET,
 
 #include "registers_list.h"
 
 #undef RESERVED_REGISTER
 #undef IO_REGISTER
+};
+
+enum INSTRUCTION_DURATION {
+    HANDLE_INTERRUPT_DURATION = 4,
+#define INSTRUCTION(NAME, CONDITION, DURATION, FILL_ARGS)     \
+    NAME##_DURATION = DURATION,
+#include "decode.h"
+#undef INSTRUCTION
+};
 
 enum ERR {
     ERR_SUCCESS = 0,
@@ -38,7 +60,20 @@ enum ERR {
     ERR_INVALID_OPCODE
 };
 
-enum SREG_BITS {
+enum INTERRUPT_TYPE {
+    INTERRUPT_INT0,
+    INTERRUPT_PCINT0,
+    INTERRUPT_NO_INT
+};
+
+enum TRIG_INT0 {
+    TRIG_LOW_LEVEL    = 0b00,
+    TRIG_LOGIC_CHANGE = 0b01,
+    TRIG_FALLING_EDGE = 0b10,
+    TRIG_RISING_EDGE  = 0b11
+};
+
+enum BITS_SREG {
     SREG_C = 0,
     SREG_Z = 1,
     SREG_N = 2,
@@ -49,37 +84,14 @@ enum SREG_BITS {
     SREG_I = 7
 };
 
-enum INTERRUPT_PINS {
-    INT0_PIN     = 4,
-    GIMSK_INT0   = 6,
-    GIMSK_PCIE   = 5,
-    MCUCR_ISC00  = 0,
-    MCUCR_ISC01  = 1,
-    GIFR_INT0    = 6,
-    GIFR_PCIF    = 5
-};
-
-enum INTERRUPT_TYPE {
-    INTERRUPT_INT0,
-    INTERRUPT_PCINT0,
-    INTERRUPT_NO_INT
-};
-
-enum TRIG_INT0 {
-    TRIG_LOW_LEVEL = 0,
-    TRIG_LOGIC_CHANGE,
-    TRIG_FALLING_EDGE,
-    TRIG_RISING_EDGE
-};
-
-enum PINS_ADCSRB {
+enum BITS_ADCSRB {
     ADTS0   = 0,
     ADTS1   = 1,
     ADTS2   = 2,
     ACME    = 6
 };
 
-enum PINS_ADCL {
+enum BITS_ADCL {
     ADCL0   = 0,
     ADCL1   = 1,
     ADCL2   = 2,
@@ -90,7 +102,7 @@ enum PINS_ADCL {
     ADCL7   = 7
 };
 
-enum PINS_ADCH {
+enum BITS_ADCH {
     ADCH0   = 0,
     ADCH1   = 1,
     ADCH2   = 2,
@@ -101,7 +113,7 @@ enum PINS_ADCH {
     ADCH7   = 7
 };
 
-enum PINS_ADCSRA {
+enum BITS_ADCSRA {
     ADPS0   = 0,
     ADPS1   = 1,
     ADPS2   = 2,
@@ -112,14 +124,14 @@ enum PINS_ADCSRA {
     ADEN    = 7
 };
 
-enum PINS_ADMUX {
+enum BITS_ADMUX {
     MUX0    = 0,
     MUX1    = 1,
     ADLAR   = 5,
     REFS0   = 6
 };
 
-enum PINS_ACSR {
+enum BITS_ACSR {
     ACIS0   = 0,
     ACIS1   = 1,
     ACIE    = 3,
@@ -129,7 +141,7 @@ enum PINS_ACSR {
     ACD     = 7
 };
 
-enum PINS_DIDR0 {
+enum BITS_DIDR0 {
     AIN0D   = 0,
     AIN1D   = 1,
     ADC1D   = 2,
@@ -138,7 +150,7 @@ enum PINS_DIDR0 {
     ADC0D   = 5
 };
 
-enum PINS_PCMSK {
+enum BITS_PCMSK {
     PCINT0  = 0,
     PCINT1  = 1,
     PCINT2  = 2,
@@ -147,7 +159,7 @@ enum PINS_PCMSK {
     PCINT5  = 5
 };
 
-enum PINS_PINB {
+enum BITS_PINB {
     PINB0   = 0,
     PINB1   = 1,
     PINB2   = 2,
@@ -156,7 +168,7 @@ enum PINS_PINB {
     PINB5   = 5
 };
 
-enum PINS_DDRB {
+enum BITS_DDRB {
     DDB0    = 0,
     DDB1    = 1,
     DDB2    = 2,
@@ -165,7 +177,7 @@ enum PINS_DDRB {
     DDB5    = 5
 };
 
-enum PINS_PORTB {
+enum BITS_PORTB {
     PORTB0  = 0,
     PORTB1  = 1,
     PORTB2  = 2,
@@ -174,7 +186,7 @@ enum PINS_PORTB {
     PORTB5  = 5
 };
 
-enum PINS_EECR {
+enum BITS_EECR {
     EERE    = 0,
     EEWE    = 1,
     EEPE    = 1,
@@ -185,7 +197,7 @@ enum PINS_EECR {
     EEPM1   = 5
 };
 
-enum PINS_EEDR {
+enum BITS_EEDR {
     EEDR0   = 0,
     EEDR1   = 1,
     EEDR2   = 2,
@@ -196,7 +208,7 @@ enum PINS_EEDR {
     EEDR7   = 7
 };
 
-enum PINS_EEARL {
+enum BITS_EEARL {
     EEAR0   = 0,
     EEAR1   = 1,
     EEAR2   = 2,
@@ -205,7 +217,7 @@ enum PINS_EEARL {
     EEAR5   = 5
 };
 
-enum PINS_WDTCR {
+enum BITS_WDTCR {
     WDP0    = 0,
     WDP1    = 1,
     WDP2    = 2,
@@ -216,12 +228,12 @@ enum PINS_WDTCR {
     WDTIF   = 7
 };
 
-enum PINS_PRR {
+enum BITS_PRR {
     PRADC   = 0,
     PRTIM0  = 1
 };
 
-enum PINS_CLKPR {
+enum BITS_CLKPR {
     CLKPS0  = 0,
     CLKPS1  = 1,
     CLKPS2  = 2,
@@ -229,12 +241,12 @@ enum PINS_CLKPR {
     CLKPCE  = 7
 };
 
-enum PINS_GTCCR {
+enum BITS_GTCCR {
     PSR10   = 0,
     TSM     = 7
 };
 
-enum PINS_OCR0B {
+enum BITS_OCR0B {
     OCR0B_0 = 0,
     OCR0B_1 = 1,
     OCR0B_2 = 2,
@@ -245,7 +257,7 @@ enum PINS_OCR0B {
     OCR0B_7 = 7
 };
 
-enum PINS_DWDR {
+enum BITS_DWDR {
     DWDR0   = 0,
     DWDR1   = 1,
     DWDR2   = 2,
@@ -256,7 +268,7 @@ enum PINS_DWDR {
     DWDR7   = 7
 };
 
-enum PINS_TCCR0A {
+enum BITS_TCCR0A {
     WGM00   = 0,
     WGM01   = 1,
     COM0B0  = 4,
@@ -265,12 +277,12 @@ enum PINS_TCCR0A {
     COM0A1  = 7
 };
 
-enum PINS_BODCR {
+enum BITS_BODCR {
     BODSE   = 0,
     BODS    = 1
 };
 
-enum PINS_OSCCAL {
+enum BITS_OSCCAL {
     CAL0    = 0,
     CAL1    = 1,
     CAL2    = 2,
@@ -280,7 +292,7 @@ enum PINS_OSCCAL {
     CAL6    = 6
 };
 
-enum PINS_TCNT0 {
+enum BITS_TCNT0 {
     TCNT0_0 = 0,
     TCNT0_1 = 1,
     TCNT0_2 = 2,
@@ -291,7 +303,7 @@ enum PINS_TCNT0 {
     TCNT0_7 = 7
 };
 
-enum PINS_TCCR0B {
+enum BITS_TCCR0B {
     CS00    = 0,
     CS01    = 1,
     CS02    = 2,
@@ -300,14 +312,14 @@ enum PINS_TCCR0B {
     FOC0A   = 7
 };
 
-enum PINS_MCUSR {
+enum BITS_MCUSR {
     PORF    = 0,
     EXTRF   = 1,
     BORF    = 2,
     WDRF    = 3
 };
 
-enum PINS_MCUCR {
+enum BITS_MCUCR {
     ISC00   = 0,
     ISC01   = 1,
     SM0     = 3,
@@ -316,7 +328,7 @@ enum PINS_MCUCR {
     PUD     = 6
 };
 
-enum PINS_OCR0A {
+enum BITS_OCR0A {
     OCR0A_0 = 0,
     OCR0A_1 = 1,
     OCR0A_2 = 2,
@@ -327,7 +339,7 @@ enum PINS_OCR0A {
     OCR0A_7 = 7
 };
 
-enum PINS_SPMCSR {
+enum BITS_SPMCSR {
     SPMEN   = 0,
     PGERS   = 1,
     PGWRT   = 2,
@@ -335,24 +347,24 @@ enum PINS_SPMCSR {
     CTPB    = 4
 };
 
-enum PINS_TIFR0 {
+enum BITS_TIFR0 {
     TOV0    = 1,
     OCF0A   = 2,
     OCF0B   = 3
 };
 
-enum PINS_TIMSK0 {
+enum BITS_TIMSK0 {
     TOIE0   = 1,
     OCIE0A  = 2,
     OCIE0B  = 3
 };
 
-enum PINS_GIFR {
+enum BITS_GIFR {
     PCIF    = 5,
     INTF0   = 6
 };
 
-enum PINS_GIMSK {
+enum BITS_GIMSK {
     PCIE    = 5,
     INT0    = 6,
 };
