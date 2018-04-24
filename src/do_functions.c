@@ -55,7 +55,7 @@ DO_FUNC(AND,
 
     chip->SREG &= _BV(SREG_V);
 
-
+    chip->PC++;
 })
 DO_FUNC(ADD,
 {
@@ -75,6 +75,7 @@ DO_FUNC(ADD,
         else
             chip->SREG &= ~_BV(i);
     }
+    chip->PC++;
 })
 
 DO_FUNC(SUB,
@@ -95,6 +96,7 @@ DO_FUNC(SUB,
         else
             chip->SREG &= ~_BV(i);
     }
+    chip->PC++;
 })
 
 DO_FUNC(CP,
@@ -114,12 +116,13 @@ DO_FUNC(CP,
         else
             chip->SREG &= ~_BV(i);
     }
-
+    chip->PC++;
 })
 
 DO_FUNC(MOV,
 {
     Rd = Rr;
+    chip->PC++;
 })
 
 DO_FUNC(PUSH,
@@ -129,6 +132,7 @@ DO_FUNC(PUSH,
     if(chip->SPL <= (REGISTERS_NUM + IO_REGISTERS_NUM))
         return ERR_STACK_OVERFLOW;
     chip->data_memory[chip->SPL--] = Rr;
+    chip->PC++;
 })
 
 DO_FUNC(POP,
@@ -138,6 +142,7 @@ DO_FUNC(POP,
     if(chip->SPL == DATA_MEMORY_SIZE - 1)
        return ERR_EMPTY_STACK;
     Rr = chip->data_memory[(chip->SPL)++];
+    chip->PC++;
 })
 
 DO_FUNC(BREQ,
