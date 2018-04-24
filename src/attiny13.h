@@ -35,7 +35,7 @@ struct attiny13 {
     /* Data Memory end */
 
     /* Flash memory: 1024 bytes */
-    int8_t  flash_memory[FLASH_MEMORY_SIZE];
+    int16_t  flash_memory[FLASH_MEMORY_SIZE];
     uint16_t PC;
 };
 
