@@ -15,6 +15,7 @@ int execute_cycle(struct attiny13* chip)
     refresh_interrupt_flags(chip);
 
     int16_t cmd = chip->flash_memory[chip->PC];
+    cmd = (cmd >> 8) | (cmd << 8); // Change endian
     static struct cmd instr = {0};
     int decode_err = ERR_SUCCESS;
 
