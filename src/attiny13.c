@@ -5,8 +5,9 @@ int attiny13_ctor(struct attiny13* chip)
 {
     chip->data_memory  = chip->registers;
     chip->io_registers = &(chip->data_memory[IO_REGISTERS_OFFSET]);
-    (void)memset(chip->data_memory,  0x00, DATA_MEMORY_SIZE);
-    (void)memset(chip->flash_memory, 0x00, FLASH_MEMORY_SIZE);
+    (void)memset(chip->data_memory,  0x00, DATA_MEMORY_SIZE  * sizeof(*chip->data_memory));
+    (void)memset(chip->flash_memory, 0x00, FLASH_MEMORY_SIZE * sizeof(*chip->flash_memory));
+    chip->PC = 0x0000;
     return 0;
 }
 
@@ -14,12 +15,13 @@ int execute_cycle(struct attiny13* chip)
 {
     refresh_interrupt_flags(chip);
 
-    int16_t cmd = chip->flash_memory[chip->PC];
-    cmd = (cmd >> 8) | (cmd << 8); // Change endian
     static struct cmd instr = {0};
     int decode_err = ERR_SUCCESS;
+    int16_t cmd = 0;
 
-    if (instr.is_finished) {
+    if (instr.progress == 0) {
+        cmd = chip->flash_memory[chip->PC];
+        cmd = (cmd >> 8) | (cmd << 8); // Change endian
         decode_err = decode(chip, &instr, cmd);
         if (decode_err)
             return decode_err;

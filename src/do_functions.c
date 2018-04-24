@@ -6,18 +6,16 @@ int do_##INSTR_NAME(struct attiny13* chip,          \
 {                                                   \
     instr->progress++;                              \
     CODE;                                           \
-    if (instr->progress == INSTR_NAME##_DURATION) { \
+    if (instr->progress == INSTR_NAME##_DURATION)   \
         instr->progress = 0;                        \
-        instr->is_finished = 1;                     \
-    }                                               \
     return ERR_SUCCESS;                             \
 }
 
 DO_FUNC(HANDLE_INTERRUPT,
 {
-    if (instr->progress == 1)
+    if (instr->progress == 2)
         attiny13_push_pc(chip);
-    else if (instr->progress == 3)
+    else if (instr->progress == 4)
         chip->PC = instr->args.arg[0];      // Jump to interrupt vector
 })
 

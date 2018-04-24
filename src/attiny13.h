@@ -45,7 +45,6 @@ struct cmd {
         uint16_t addr;
     } args;
     int progress;
-    int is_finished;
     int (*func)(struct attiny13* chip, struct cmd* instr);
 };
 
