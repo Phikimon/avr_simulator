@@ -120,14 +120,14 @@ int check_interrupt(struct attiny13* chip, struct cmd* instr)
 
     if ((are_interrupts_enabled) && (is_INT0_enabled) &&
         (is_INT0_low_level_interrupt || is_INT0_pin_change_interrupt)) {
-        instr->args.arg[0] = INTERRUPT_INT0;
+        instr->args.arg[0] = INTERRUPT_VECTOR_INT0;
         chip->GIFR &= ~_BV(INTF0); // Clear interrupt flag
         goto is_interrupt;
     }
 
     if ((are_interrupts_enabled) && (is_PCINT_enabled) &&
         (is_PCINT_interrupt)) {
-        instr->args.arg[0] = INTERRUPT_PCINT0;
+        instr->args.arg[0] = INTERRUPT_VECTOR_PCINT;
         chip->GIFR &= ~_BV(PCIF); // Clear interrupt flag
         goto is_interrupt;
     }
@@ -143,9 +143,9 @@ is_interrupt:
 }
 
 int attiny13_push_pc(struct attiny13* chip) {
-    return ERR_SUCCESS;
-}
-
-int attiny13_call_handler(struct attiny13* chip, uint8_t addr) {
+    chip->SPL -= 2;
+    if(chip->SPL < (REGISTERS_NUM + IO_REGISTERS_NUM))
+        return ERR_STACK_OVERFLOW;
+    *(uint16_t*)(chip->data_memory + chip->SPL) = chip->PC;
     return ERR_SUCCESS;
 }

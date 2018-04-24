@@ -19,8 +19,7 @@ DO_FUNC(HANDLE_INTERRUPT,
     if (instr->progress == 1)
         attiny13_push_pc(chip);
     else if (instr->progress == 3)
-        attiny13_call_handler(chip, instr->args.arg[0]);
-
+        chip->PC = instr->args.arg[0];      // Jump to interrupt vector
 })
 
 DO_FUNC(IN,

@@ -58,7 +58,6 @@ struct cmd {
     int decode                  (struct attiny13* chip, struct cmd* instr, int16_t cmd);
     int do_HANDLE_INTERRUPT     (struct attiny13* chip, struct cmd* instr);
     int attiny13_push_pc        (struct attiny13* chip);
-    int attiny13_call_handler   (struct attiny13* chip, uint8_t addr);
 
 
 int do_IN   (struct attiny13* chip, struct cmd* instr);
