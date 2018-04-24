@@ -4,12 +4,11 @@
 int do_##INSTR_NAME(struct attiny13* chip,          \
                     struct cmd* instr)              \
 {                                                   \
+    instr->progress++;                              \
     CODE;                                           \
     if (instr->progress == INSTR_NAME##_DURATION) { \
         instr->progress = 0;                        \
         instr->is_finished = 1;                     \
-    } else {                                        \
-        instr->progress++;                          \
     }                                               \
     return ERR_SUCCESS;                             \
 }
@@ -127,6 +126,8 @@ DO_FUNC(MOV,
 
 DO_FUNC(PUSH,
 {
+    if(instr->progress == 1)
+        return ERR_SUCCESS;
     if(chip->SPL <= (REGISTERS_NUM + IO_REGISTERS_NUM))
         return ERR_STACK_OVERFLOW;
     chip->data_memory[chip->SPL--] = Rr;
@@ -134,6 +135,8 @@ DO_FUNC(PUSH,
 
 DO_FUNC(POP,
 {
+    if(instr->progress == 1)
+        return ERR_SUCCESS;
     if(chip->SPL == DATA_MEMORY_SIZE - 1)
        return ERR_EMPTY_STACK;
     Rr = chip->data_memory[(chip->SPL)++];
