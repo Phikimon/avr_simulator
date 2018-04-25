@@ -3,6 +3,14 @@
 
 #define GET_PIN_VALUE(PIN_NUM) ((enum PIN_STATE)((chip->PINB >> PIN_NUM) & 1))
 #define _BV(n) (1 << n)
+#define GET_FLAG_C ((chip->SREG >> SREG_C) & 1)
+#define GET_FLAG_Z ((chip->SREG >> SREG_Z) & 1)
+#define GET_FLAG_N ((chip->SREG >> SREG_N) & 1)
+#define GET_FLAG_V ((chip->SREG >> SREG_V) & 1)
+#define GET_FLAG_S ((chip->SREG >> SREG_S) & 1)
+#define GET_FLAG_H ((chip->SREG >> SREG_H) & 1)
+#define GET_FLAG_T ((chip->SREG >> SREG_T) & 1)
+#define GET_FLAG_I ((chip->SREG >> SREG_I) & 1)
 
 enum PIN_STATE {
     PIN_LOW  = 0,
@@ -27,7 +35,7 @@ enum { DATA_MEMORY_SIZE    = REGISTERS_NUM    +
                              IO_REGISTERS_NUM +
                              SRAM_SIZE };
 enum { PIN_INT0 = PB1 };
-enum { FLASH_MEMORY_SIZE   = 0x0200 }; // 1024
+enum { FLASH_MEMORY_SIZE   = 0x0200 }; // 512
 enum { PIN_NUM             = 6 };
 // OFFSETS CONSTANTS
 enum { REGISTERS_OFFSET    = 0             };

@@ -95,7 +95,8 @@ int decode(struct attiny13* chip, struct cmd* instr, int16_t cmd)
 {                                                             \
     if (CONDITION) {                                          \
         instr->func = do_##NAME;                              \
-        instr->progress = instr->is_finished = 0;             \
+        instr->progress = 0;                                  \
+        instr->duration = DURATION;                           \
         FILL_ARGS;                                            \
         return ERR_SUCCESS;                                   \
     }                                                         \
@@ -109,7 +110,7 @@ int decode(struct attiny13* chip, struct cmd* instr, int16_t cmd)
 
 int check_interrupt(struct attiny13* chip, struct cmd* instr)
 {
-    int are_interrupts_enabled = chip->SREG & _BV(SREG_I);
+    int are_interrupts_enabled = GET_FLAG_I;
 
     int is_INT0_enabled = chip->GIMSK & _BV(INT0);
     int INT0_trigger    = chip->MCUCR & _BV(ISC01) & _BV(ISC00);
@@ -140,7 +141,7 @@ int check_interrupt(struct attiny13* chip, struct cmd* instr)
 is_interrupt:
     instr->func = do_HANDLE_INTERRUPT;
     instr->progress = 0;
-    instr->is_finished = 0;
+    instr->duration = HANDLE_INTERRUPT_DURATION;
     chip->SREG &= ~(1 << SREG_I); // Clear global interrupt flag
     return ERR_INTERRUPT;
 }

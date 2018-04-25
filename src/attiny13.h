@@ -45,6 +45,7 @@ struct cmd {
         uint16_t addr;
     } args;
     int progress;
+    int duration;
     int (*func)(struct attiny13* chip, struct cmd* instr);
 };
 
@@ -63,7 +64,7 @@ int do_IN   (struct attiny13* chip, struct cmd* instr);
 int do_OUT  (struct attiny13* chip, struct cmd* instr);
 
 int do_CBI  (struct attiny13* chip, struct cmd* instr);
-int do_SBIS (struct attiny13* chip, struct cmd* instr);
+int do_SBI  (struct attiny13* chip, struct cmd* instr);
 
 int do_AND  (struct attiny13* chip, struct cmd* instr);
 int do_ADD  (struct attiny13* chip, struct cmd* instr);
