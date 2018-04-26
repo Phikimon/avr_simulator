@@ -37,11 +37,11 @@ do {                                                          \
     instr->args.addr = cmd & 0x0FFF;                           \
 } while (0)
 
-// xxxx FFFF ZZZZ FFFF
+// xxxx ZZZZ FFFF ZZZZ
 #define FILL_ARGS_LDI_CPI                                     \
 do {                                                          \
-    instr->args.arg[0] = (cmd >> 4) & 0x0F;                   \
-    instr->args.arg[1] = (cmd & 0x0F) | ((cmd >> 4) & 0xF0);  \
+    instr->args.arg[0] = (cmd & 0x0F) | ((cmd >> 4) & 0xF0);  \
+    instr->args.arg[1] = ((cmd >> 4) & 0x0F) + 16;            \
 } while (0)
 
 // xxxx xxxx xxxx xxxx
