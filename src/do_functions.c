@@ -1,9 +1,7 @@
 #include "attiny13.h"
 #include "assert.h"
 
-
-int is_reserved(int8_t offset);
-
+static int is_reserved(int8_t offset);
 
 
 #define DO_FUNC(INSTR_NAME, CODE)                   \
@@ -25,7 +23,7 @@ DO_FUNC(HANDLE_INTERRUPT,
         chip->PC = instr->args.arg[0];      // Jump to interrupt vector
 })
 
-int is_reserved(int8_t offset) {
+static int is_reserved(int8_t offset) {
 #define IO_REGISTER(NAME, OFFSET)   \
     case OFFSET:                    \
         return 0;
@@ -46,6 +44,7 @@ int is_reserved(int8_t offset) {
 #define __A  instr->args.arg[0]
 #define __b  instr->args.arg[1]
 #define __k  instr->args.addr
+#define __K  instr->args.arg[0]
 
 DO_FUNC(IN,
 {
@@ -176,7 +175,7 @@ DO_FUNC(PUSH,
 {
     if (instr->progress == 1)
         return ERR_SUCCESS;
-    if (chip->SPL <= (REGISTERS_NUM + IO_REGISTERS_NUM))
+    if (chip->SPL < (REGISTERS_NUM + IO_REGISTERS_NUM))
         return ERR_STACK_OVERFLOW;
     chip->data_memory[chip->SPL--] = __Rr;
     chip->PC++;
@@ -186,21 +185,20 @@ DO_FUNC(POP,
 {
     if (instr->progress == 1)
         return ERR_SUCCESS;
-    if (chip->SPL == DATA_MEMORY_SIZE - 1)
+    if (chip->SPL >= DATA_MEMORY_SIZE - 1)
        return ERR_EMPTY_STACK;
-    __Rr = chip->data_memory[(chip->SPL)++];
+    __Rr = chip->data_memory[++chip->SPL];
     chip->PC++;
 })
 
-#define DO_CONDITIONAL_BRANCH(CONDITION)                        \
-    do {                                                        \
-        if (instr->progress == 1 && !(CONDITION)) {             \
-            instr->duration = 1;    /* No branch */             \
-            chip->PC++;                                         \
-            return ERR_SUCCESS;                                 \
-        }                                                       \
-        chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;    \
-        return ERR_SUCCESS;                                     \
+#define DO_CONDITIONAL_BRANCH(CONDITION)                            \
+    do {                                                            \
+        if (instr->progress == 1 && !(CONDITION)) {                 \
+            instr->duration = 1;    /* No branch */                 \
+            chip->PC++;                                             \
+        }                                                           \
+        else                                                        \
+            chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;    \
     } while (0)
 
 
@@ -222,23 +220,54 @@ DO_FUNC(BRGE,
 
 DO_FUNC(CPI,
 {
+    int Rd7 = (__Rd >> 7);
+    int K7 = (__K >> 7);
+    int R7 = ((__Rd - __K) >> 7);
+    int SREG_bits[5] = {0};
+    SREG_bits[SREG_C] = (~Rd7 & K7) | (K7 & R7) | (R7 & ~Rd7);
+    SREG_bits[SREG_Z] = !(__Rd - __K);
+    SREG_bits[SREG_N] = R7;
+    SREG_bits[SREG_V] = (Rd7 & ~K7 & ~R7) | (~Rd7 & K7 & R7);
+    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
+    for (int i = 0; i < 5; i++) {
+        if (SREG_bits[i])
+            chip->SREG |= _BV(i);
+        else
+            chip->SREG &= ~_BV(i);
+    }
+    chip->PC++;
 })
 
 DO_FUNC(LDI,
 {
+    __Rd = __K;
+    chip->PC++;
 })
 
 DO_FUNC(NOP,
 {
+    chip->PC++;
 })
 
 DO_FUNC(RET,
 {
+    if(instr->progress < 4)
+        return ERR_SUCCESS;
+    if(chip->SPL >= DATA_MEMORY_SIZE - 3)
+        return ERR_EMPTY_STACK;
+    chip->PC = *(uint16_t*)(chip->data_memory + chip->SPL + 1);
+    chip->SPL += 2;
 })
 
 DO_FUNC(RETI,
 {
-    //Не забудь выставить I в SREG!
+    if(instr->progress < 4)
+        return ERR_SUCCESS;
+    if(chip->SPL >= DATA_MEMORY_SIZE - 3)
+        return ERR_EMPTY_STACK;
+    chip->PC = *(uint16_t*)(chip->data_memory + chip->SPL + 1);
+    chip->SPL += 2;
+    chip->SREG |= _BV(SREG_I);
 })
 
 #undef DO_FUNC
