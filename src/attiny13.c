@@ -147,9 +147,9 @@ is_interrupt:
 }
 
 int attiny13_push_pc(struct attiny13* chip) {
-    chip->SPL -= 2;
-    if(chip->SPL < (REGISTERS_NUM + IO_REGISTERS_NUM))
+    if(chip->SPL < (REGISTERS_NUM + IO_REGISTERS_NUM + 1))
         return ERR_STACK_OVERFLOW;
-    *(uint16_t*)(chip->data_memory + chip->SPL) = chip->PC + 1;
+    *(uint16_t*)(chip->data_memory + chip->SPL - 1) = chip->PC + 1;
+    chip->SPL -= 2;
     return ERR_SUCCESS;
 }
