@@ -246,6 +246,19 @@ DO_FUNC(MOV,
     chip->PC++;
 })
 
+DO_FUNC(CLR,
+{
+    __Rd = 0;
+    chip->SREG |= _BV(SREG_Z);
+    chip->SREG &= ~(_BV(SREG_N) | _BV(SREG_V) | _BV(SREG_S));
+    chip->PC++;
+})
+
+DO_FUNC(SER,
+{
+    __Rd = 0xFF;
+    chip->PC++;
+})
 DO_FUNC(PUSH,
 {
     if (chip->cmd.progress == 1)

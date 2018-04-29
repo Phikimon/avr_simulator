@@ -44,6 +44,18 @@ do {                                                             \
     chip->cmd.args.arg[1] = ((cmd >> 4) & 0x0F) + 16;            \
 } while (0)
 
+// xxxx xxdd dddd dddd
+#define FILL_ARGS_LONG_D                                         \
+do {                                                             \
+    chip->cmd.args.arg[1] = (cmd & 0x03FF) % REGISTERS_NUM;      \
+} while (0)
+
+//xxxx xxxx dddd xxxx
+#define FILL_ARGS_SER                                            \
+do {                                                             \
+    chip->cmd.args.arg[1] = ((cmd >> 4) & 0x0F) + 16;            \
+} while (0)
+
 // xxxx xxxx xxxx xxxx
 #define FILL_ARGS_NO_ARGS
 
@@ -64,6 +76,8 @@ do {                                                             \
     INSTRUCTION ( INC   , ((cmd & 0xFC00) == 0x9403) ,     1    , FILL_ARGS_ALU      )
     INSTRUCTION ( CP    , ((cmd & 0xFC00) == 0x1400) ,     1    , FILL_ARGS_ALU      )
     INSTRUCTION ( MOV   , ((cmd & 0xFC00) == 0x2C00) ,     1    , FILL_ARGS_ALU      )
+    INSTRUCTION ( CLR   , ((cmd & 0xFC00) == 0x2400) ,     1    , FILL_ARGS_LONG_D   )
+    INSTRUCTION ( SER   , ((cmd & 0xFF0F) == 0xEF0F) ,     1    , FILL_ARGS_SER      )
 
     INSTRUCTION ( PUSH  , ((cmd & 0xFE0F) == 0x920F) ,     2    , FILL_ARGS_PUSH_POP )
     INSTRUCTION ( POP   , ((cmd & 0xFE0F) == 0x900F) ,     2    , FILL_ARGS_PUSH_POP )
@@ -116,4 +130,6 @@ do {                                                             \
 #undef FILL_ARGS_BRANCH
 #undef FILL_ARGS_RJMP_RCALL
 #undef FILL_ARGS_LDI_CPI
+#undef FILL_ARGS_LONG_D
+#undef FILL_ARGS_SER
 #undef FILL_ARGS_NO_ARGS
