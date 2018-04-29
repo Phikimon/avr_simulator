@@ -1,13 +1,16 @@
 #include "attiny13.h"
+#include <stdio.h>
 #include <string.h>
 
 int attiny13_ctor(struct attiny13* chip)
 {
     chip->data_memory  = chip->registers;
-    chip->io_registers = &(chip->data_memory[IO_REGISTERS_OFFSET]);
+    chip->io_registers = (uint8_t*)&(chip->data_memory[IO_REGISTERS_OFFSET]);
     (void)memset(chip->data_memory,  0x00, DATA_MEMORY_SIZE  * sizeof(*chip->data_memory));
     (void)memset(chip->flash_memory, 0x00, FLASH_MEMORY_SIZE * sizeof(*chip->flash_memory));
     chip->PC = 0x0000;
+    chip->SPL = DATA_MEMORY_SIZE - 1;    // 0x9F
+    chip->cmd.progress = 0;
     return 0;
 }
 
@@ -15,19 +18,18 @@ int execute_cycle(struct attiny13* chip)
 {
     refresh_interrupt_flags(chip);
 
-    static struct cmd instr = {0};
     int decode_err = ERR_SUCCESS;
-    int16_t cmd = 0;
+    uint16_t cmd = 0;
 
-    if (instr.progress == 0) {
+    if (chip->cmd.progress == 0) {
         cmd = chip->flash_memory[chip->PC];
-        cmd = (cmd >> 8) | (cmd << 8); // Change endian
-        decode_err = decode(chip, &instr, cmd);
+    //    cmd = (cmd >> 8) | (cmd << 8); // Change endian                       /// !!!!!!!!!!!!!!111
+        decode_err = decode(chip, cmd);
         if (decode_err)
             return decode_err;
     }
 
-    return instr.func(chip, &instr);
+    return chip->cmd.func(chip);
 }
 
 
@@ -87,17 +89,19 @@ int refresh_interrupt_flags(struct attiny13* chip)
     return ERR_SUCCESS;
 }
 
-int decode(struct attiny13* chip, struct cmd* instr, int16_t cmd)
+int decode(struct attiny13* chip, uint16_t cmd)
 {
-    if ((check_interrupt(chip, instr) == ERR_INTERRUPT))
+    if ((check_interrupt(chip) == ERR_INTERRUPT))
         return ERR_SUCCESS;
+    printf("\n%4X", cmd);
 #define INSTRUCTION(NAME, CONDITION, DURATION, FILL_ARGS)     \
 {                                                             \
     if (CONDITION) {                                          \
-        instr->func = do_##NAME;                              \
-        instr->progress = 0;                                  \
-        instr->duration = DURATION;                           \
+        chip->cmd.func = do_##NAME;                           \
+        chip->cmd.progress = 0;                               \
+        chip->cmd.duration = DURATION;                        \
         FILL_ARGS;                                            \
+        printf("\t%s\n", #NAME);                              \
         return ERR_SUCCESS;                                   \
     }                                                         \
 } // Do-while-0 is not used intentionally
@@ -108,7 +112,7 @@ int decode(struct attiny13* chip, struct cmd* instr, int16_t cmd)
     return ERR_INVALID_OPCODE;
 }
 
-int check_interrupt(struct attiny13* chip, struct cmd* instr)
+int check_interrupt(struct attiny13* chip)
 {
     int are_interrupts_enabled = GET_FLAG_I;
 
@@ -124,14 +128,14 @@ int check_interrupt(struct attiny13* chip, struct cmd* instr)
 
     if ((are_interrupts_enabled) && (is_INT0_enabled) &&
         (is_INT0_low_level_interrupt || is_INT0_pin_change_interrupt)) {
-        instr->args.arg[0] = INTERRUPT_VECTOR_INT0;
+        chip->cmd.args.arg[0] = INTERRUPT_VECTOR_INT0;
         chip->GIFR &= ~_BV(INTF0); // Clear interrupt flag
         goto is_interrupt;
     }
 
     if ((are_interrupts_enabled) && (is_PCINT_enabled) &&
         (is_PCINT_interrupt)) {
-        instr->args.arg[0] = INTERRUPT_VECTOR_PCINT;
+        chip->cmd.args.arg[0] = INTERRUPT_VECTOR_PCINT;
         chip->GIFR &= ~_BV(PCIF); // Clear interrupt flag
         goto is_interrupt;
     }
@@ -139,14 +143,15 @@ int check_interrupt(struct attiny13* chip, struct cmd* instr)
     return ERR_SUCCESS;
 
 is_interrupt:
-    instr->func = do_HANDLE_INTERRUPT;
-    instr->progress = 0;
-    instr->duration = HANDLE_INTERRUPT_DURATION;
+    chip->cmd.func = do_HANDLE_INTERRUPT;
+    chip->cmd.progress = 0;
+    chip->cmd.duration = HANDLE_INTERRUPT_DURATION;
     chip->SREG &= ~(1 << SREG_I); // Clear global interrupt flag
     return ERR_INTERRUPT;
 }
 
-int attiny13_push_pc(struct attiny13* chip) {
+int attiny13_push_pc(struct attiny13* chip)
+{
     if(chip->SPL < (REGISTERS_NUM + IO_REGISTERS_NUM + 1))
         return ERR_STACK_OVERFLOW;
     *(uint16_t*)(chip->data_memory + chip->SPL - 1) = chip->PC + 1;
