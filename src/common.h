@@ -2,7 +2,9 @@
 #define COMMON_H
 
 #define GET_PIN_VALUE(PIN_NUM) ((enum PIN_STATE)((chip->PINB >> PIN_NUM) & 1))
+
 #define _BV(n) (1 << n)
+
 #define GET_FLAG_C ((chip->SREG >> SREG_C) & 1)
 #define GET_FLAG_Z ((chip->SREG >> SREG_Z) & 1)
 #define GET_FLAG_N ((chip->SREG >> SREG_N) & 1)
@@ -11,6 +13,11 @@
 #define GET_FLAG_H ((chip->SREG >> SREG_H) & 1)
 #define GET_FLAG_T ((chip->SREG >> SREG_T) & 1)
 #define GET_FLAG_I ((chip->SREG >> SREG_I) & 1)
+
+#define X_ADDR ((uint16_t)chip->registers[26] | ((uint16_t)chip->registers[27] << 8))
+#define Y_ADDR ((uint16_t)chip->registers[28] | ((uint16_t)chip->registers[29] << 8))
+#define Z_ADDR ((uint16_t)chip->registers[30] | ((uint16_t)chip->registers[31] << 8))
+
 
 enum PIN_STATE {
     PIN_LOW  = 0,
