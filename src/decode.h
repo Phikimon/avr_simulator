@@ -47,7 +47,7 @@ do {                                                             \
 // xxxx xxdd dddd dddd
 #define FILL_ARGS_LONG_D                                         \
 do {                                                             \
-    chip->cmd.args.arg[1] = (cmd & 0x03FF) % REGISTERS_NUM;      \
+    chip->cmd.args.arg[1] = cmd & 0x001F;                        \
 } while (0)
 
 //xxxx xxxx dddd xxxx
