@@ -148,7 +148,7 @@ DO_FUNC(ADD,
     int Rd7 = (__Rd >> 7);
     int Rr7 = (__Rr >> 7);
     __Rd = __Rd + __Rr;
-    int R7 = (__Rd >> 7);                                           // WRONG FLAGS QT ( H FLAG)
+    int R7 = (__Rd >> 7);
     int SREG_bits[5] = {0};
     SREG_bits[SREG_C] = (Rd7 & Rr7) | (Rr7 & ~R7) | (~R7 & Rd7);
     SREG_bits[SREG_Z] = !__Rd;
@@ -259,6 +259,24 @@ DO_FUNC(SER,
     __Rd = 0xFF;
     chip->PC++;
 })
+
+DO_FUNC(TST,
+{
+    if(__Rd == 0)
+        chip->SREG |= _BV(SREG_Z);
+    else
+        chip->SREG &= ~_BV(SREG_Z);
+    if (__Rd < 0) {                        // S = N ^ V, V = 0 => S = N
+        chip->SREG |= _BV(SREG_N);
+        chip->SREG |= _BV(SREG_S);
+    } else {
+        chip->SREG &= ~_BV(SREG_N);
+        chip->SREG &= ~_BV(SREG_S);
+    }
+    chip->SREG &= ~_BV(SREG_V);
+    chip->PC++;
+})
+
 DO_FUNC(PUSH,
 {
     if (chip->cmd.progress == 1)

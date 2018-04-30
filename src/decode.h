@@ -78,6 +78,7 @@ do {                                                             \
     INSTRUCTION ( MOV   , ((cmd & 0xFC00) == 0x2C00) ,     1    , FILL_ARGS_ALU      )
     INSTRUCTION ( CLR   , ((cmd & 0xFC00) == 0x2400) ,     1    , FILL_ARGS_LONG_D   )
     INSTRUCTION ( SER   , ((cmd & 0xFF0F) == 0xEF0F) ,     1    , FILL_ARGS_SER      )
+    INSTRUCTION ( TST   , ((cmd & 0xFC00) == 0x2000) ,     1    , FILL_ARGS_LONG_D   )
 
     INSTRUCTION ( PUSH  , ((cmd & 0xFE0F) == 0x920F) ,     2    , FILL_ARGS_PUSH_POP )
     INSTRUCTION ( POP   , ((cmd & 0xFE0F) == 0x900F) ,     2    , FILL_ARGS_PUSH_POP )
