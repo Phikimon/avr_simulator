@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 struct attiny13 {
+    int number;
     /*
        Data Memory:
        1. 32 general purpose registers
