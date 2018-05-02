@@ -1,12 +1,8 @@
-#include "gui.h"
-#include "attiny13.h"
-#include <stdio.h>
+#include "threads.h"
 
 int main(int argc, char *argv[])
 {
-    gui_configure(argc, argv);
-
-    printf("Hello AVR Ximul!\n");
+    launch_threads();
 
     return 0;
 }
