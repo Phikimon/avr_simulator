@@ -1,7 +1,7 @@
 CC=gcc
 LD=gcc
 GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-3.0`
-CFLAGS=-DPATH_TO_GLADE="\"./resources/gui_layout.glade\"" -I$(DEPDIR) -O0 -Wall -pedantic -Wno-format $(GTKFLAGS)
+CFLAGS=-DPATH_TO_GLADE="\"./resources/gui_layout.glade\"" -I$(DEPDIR) -O0 -Wall -Wno-format $(GTKFLAGS)
 LFLAGS=$(GTKFLAGS)
 LIBS=-pthread
 SRCDIR=src
