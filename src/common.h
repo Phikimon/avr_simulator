@@ -18,6 +18,8 @@
 #define Y_ADDR ((uint16_t)chip->registers[28] | ((uint16_t)chip->registers[29] << 8))
 #define Z_ADDR ((uint16_t)chip->registers[30] | ((uint16_t)chip->registers[31] << 8))
 
+enum { MAX_STR_LEN = 64 };
+
 
 enum PIN_STATE {
     PIN_LOW  = 0,

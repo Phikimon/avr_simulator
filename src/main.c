@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    configure_gui(argc, argv);
+    gui_configure(argc, argv);
 
     printf("Hello AVR Ximul!\n");
 
