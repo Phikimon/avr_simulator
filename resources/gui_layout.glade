@@ -19,8 +19,8 @@
     <property name="title" translatable="yes">AVR Ximulator</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
-    <property name="default_width">1280</property>
-    <property name="default_height">800</property>
+    <property name="default_width">1200</property>
+    <property name="default_height">580</property>
     <signal name="destroy" handler="on_window_main_destroy" swapped="no"/>
     <child>
       <object class="GtkPaned" id="GtkPaned">
@@ -35,7 +35,7 @@
             <child>
               <object class="GtkLayout" id="Main_Field">
                 <property name="name">Main_Field</property>
-                <property name="height_request">770</property>
+                <property name="height_request">500</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -54,122 +54,101 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkModelButton" id="F_RESET">
-                    <property name="name">F_RESET</property>
+                  <object class="GtkImage" id="Attiny13_2">
+                    <property name="name">Attiny13_2</property>
+                    <property name="width_request">100</property>
+                    <property name="height_request">80</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixbuf">attiny13_2.png</property>
+                    <property name="icon_size">1</property>
+                  </object>
+                  <packing>
+                    <property name="x">600</property>
+                    <property name="y">300</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkImage" id="S_RESET_LED">
+                    <property name="name">S_RESET_LED</property>
                     <property name="width_request">20</property>
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">RESET</property>
+                    <property name="stock">gtk-goto-top</property>
                   </object>
                   <packing>
-                    <property name="x">250</property>
+                    <property name="x">637</property>
                     <property name="y">327</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkModelButton" id="F_PB3">
-                    <property name="name">F_PB3</property>
+                  <object class="GtkImage" id="S_PB3_LED">
+                    <property name="name">S_PB3_LED</property>
                     <property name="width_request">20</property>
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">PB3</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-goto-top</property>
                   </object>
                   <packing>
-                    <property name="x">250</property>
+                    <property name="x">637</property>
                     <property name="y">354</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkModelButton" id="F_PB4">
-                    <property name="name">F_PB4</property>
+                  <object class="GtkImage" id="S_PB4_LED">
+                    <property name="name">S_PB4_LED</property>
                     <property name="width_request">20</property>
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">PB4</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-goto-top</property>
                   </object>
                   <packing>
-                    <property name="x">250</property>
+                    <property name="x">637</property>
                     <property name="y">381</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkModelButton" id="F_GND">
-                    <property name="name">F_GND</property>
+                  <object class="GtkImage" id="S_PB2_LED">
+                    <property name="name">S_PB2_LED</property>
                     <property name="width_request">20</property>
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">GND</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-goto-top</property>
                   </object>
                   <packing>
-                    <property name="x">250</property>
-                    <property name="y">408</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkModelButton" id="F_VCC">
-                    <property name="name">F_VCC</property>
-                    <property name="width_request">20</property>
-                    <property name="height_request">20</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">VCC</property>
-                  </object>
-                  <packing>
-                    <property name="x">380</property>
-                    <property name="y">327</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkModelButton" id="F_PB2">
-                    <property name="name">F_PB2</property>
-                    <property name="width_request">20</property>
-                    <property name="height_request">20</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">PB2</property>
-                  </object>
-                  <packing>
-                    <property name="x">380</property>
+                    <property name="x">693</property>
                     <property name="y">354</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkModelButton" id="F_PB1">
-                    <property name="name">F_PB1</property>
+                  <object class="GtkImage" id="S_PB1_LED">
+                    <property name="name">S_PB1_LED</property>
                     <property name="width_request">20</property>
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">PB1</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-goto-top</property>
                   </object>
                   <packing>
-                    <property name="x">380</property>
+                    <property name="x">693</property>
                     <property name="y">381</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkModelButton" id="F_PB0">
-                    <property name="name">F_PB0</property>
+                  <object class="GtkImage" id="S_PB0_LED">
+                    <property name="name">S_PB0_LED</property>
                     <property name="width_request">20</property>
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">PB0</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-goto-top</property>
                   </object>
                   <packing>
-                    <property name="x">380</property>
+                    <property name="x">693</property>
                     <property name="y">408</property>
                   </packing>
                 </child>
@@ -257,6 +236,356 @@
                     <property name="y">408</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkImage">
+                    <property name="width_request">100</property>
+                    <property name="height_request">80</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixbuf">pwr.jpeg</property>
+                  </object>
+                  <packing>
+                    <property name="y">300</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkImage">
+                    <property name="width_request">100</property>
+                    <property name="height_request">80</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="pixbuf">gnd.jpeg</property>
+                  </object>
+                  <packing>
+                    <property name="y">400</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="S_PB2_BOX">
+                    <property name="name">S_PB2_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">F_PB0</item>
+                      <item translatable="yes">F_PB1</item>
+                      <item translatable="yes">F_PB2</item>
+                      <item translatable="yes">F_PB3</item>
+                      <item translatable="yes">F_PB4</item>
+                      <item translatable="yes">F_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">750</property>
+                    <property name="y">354</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="S_PB1_BOX">
+                    <property name="name">S_PB1_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">F_PB0</item>
+                      <item translatable="yes">F_PB1</item>
+                      <item translatable="yes">F_PB2</item>
+                      <item translatable="yes">F_PB3</item>
+                      <item translatable="yes">F_PB4</item>
+                      <item translatable="yes">F_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">750</property>
+                    <property name="y">381</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="S_PB0_BOX">
+                    <property name="name">S_PB0_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">F_PB0</item>
+                      <item translatable="yes">F_PB1</item>
+                      <item translatable="yes">F_PB2</item>
+                      <item translatable="yes">F_PB3</item>
+                      <item translatable="yes">F_PB4</item>
+                      <item translatable="yes">F_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">750</property>
+                    <property name="y">408</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="S_RESET_BOX">
+                    <property name="name">S_RESET_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">F_PB0</item>
+                      <item translatable="yes">F_PB1</item>
+                      <item translatable="yes">F_PB2</item>
+                      <item translatable="yes">F_PB3</item>
+                      <item translatable="yes">F_PB4</item>
+                      <item translatable="yes">F_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">515</property>
+                    <property name="y">327</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="S_PB3_BOX">
+                    <property name="name">S_PB3_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">F_PB0</item>
+                      <item translatable="yes">F_PB1</item>
+                      <item translatable="yes">F_PB2</item>
+                      <item translatable="yes">F_PB3</item>
+                      <item translatable="yes">F_PB4</item>
+                      <item translatable="yes">F_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">515</property>
+                    <property name="y">354</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="S_PB4_BOX">
+                    <property name="name">S_PB4_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">F_PB0</item>
+                      <item translatable="yes">F_PB1</item>
+                      <item translatable="yes">F_PB2</item>
+                      <item translatable="yes">F_PB3</item>
+                      <item translatable="yes">F_PB4</item>
+                      <item translatable="yes">F_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">515</property>
+                    <property name="y">381</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="F_PB2_BOX">
+                    <property name="name">F_PB2_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">S_PB0</item>
+                      <item translatable="yes">S_PB1</item>
+                      <item translatable="yes">S_PB2</item>
+                      <item translatable="yes">S_PB3</item>
+                      <item translatable="yes">S_PB4</item>
+                      <item translatable="yes">S_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">400</property>
+                    <property name="y">354</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="F_PB1_BOX">
+                    <property name="name">F_PB1_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">S_PB0</item>
+                      <item translatable="yes">S_PB1</item>
+                      <item translatable="yes">S_PB2</item>
+                      <item translatable="yes">S_PB3</item>
+                      <item translatable="yes">S_PB4</item>
+                      <item translatable="yes">S_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">400</property>
+                    <property name="y">381</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="F_PB0_BOX">
+                    <property name="name">F_PB0_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">S_PB0</item>
+                      <item translatable="yes">S_PB1</item>
+                      <item translatable="yes">S_PB2</item>
+                      <item translatable="yes">S_PB3</item>
+                      <item translatable="yes">S_PB4</item>
+                      <item translatable="yes">S_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">400</property>
+                    <property name="y">408</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="F_PB3_BOX">
+                    <property name="name">F_PB3_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">S_PB0</item>
+                      <item translatable="yes">S_PB1</item>
+                      <item translatable="yes">S_PB2</item>
+                      <item translatable="yes">S_PB3</item>
+                      <item translatable="yes">S_PB4</item>
+                      <item translatable="yes">S_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">165</property>
+                    <property name="y">354</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="F_PB4_BOX">
+                    <property name="name">F_PB4_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">S_PB0</item>
+                      <item translatable="yes">S_PB1</item>
+                      <item translatable="yes">S_PB2</item>
+                      <item translatable="yes">S_PB3</item>
+                      <item translatable="yes">S_PB4</item>
+                      <item translatable="yes">S_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">165</property>
+                    <property name="y">381</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkDrawingArea" id="DRAW_AREA">
+                    <property name="name">DRAW_AREA</property>
+                    <property name="width_request">628</property>
+                    <property name="height_request">216</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <signal name="draw" handler="draw" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">168</property>
+                    <property name="y">32</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="F_RESET_BOX">
+                    <property name="name">F_RESET_BOX</property>
+                    <property name="width_request">80</property>
+                    <property name="height_request">20</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="active">8</property>
+                    <items>
+                      <item translatable="yes">S_PB0</item>
+                      <item translatable="yes">S_PB1</item>
+                      <item translatable="yes">S_PB2</item>
+                      <item translatable="yes">S_PB3</item>
+                      <item translatable="yes">S_PB4</item>
+                      <item translatable="yes">S_RESET</item>
+                      <item translatable="yes">VCC</item>
+                      <item translatable="yes">GND</item>
+                      <item translatable="yes">NC</item>
+                    </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">165</property>
+                    <property name="y">327</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -305,7 +634,6 @@
                         <property name="can_focus">True</property>
                         <child>
                           <object class="GtkEntry">
-                            <property name="width_request">-1</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                           </object>
@@ -321,7 +649,6 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <property name="margin_right">170</property>
                           </object>
                           <packing>
                             <property name="resize">True</property>
@@ -347,10 +674,32 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <placeholder/>
+                      <object class="GtkFileChooserButton">
+                        <property name="width_request">640</property>
+                        <property name="height_request">45</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="title" translatable="yes"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkFileChooserButton">
+                        <property name="width_request">0</property>
+                        <property name="height_request">45</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="title" translatable="yes"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -382,7 +731,7 @@
                 <property name="can_focus">True</property>
                 <child>
                   <object class="GtkTextView">
-                    <property name="height_request">400</property>
+                    <property name="height_request">330</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
@@ -402,7 +751,7 @@
                 </child>
                 <child>
                   <object class="GtkTextView">
-                    <property name="height_request">400</property>
+                    <property name="height_request">330</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
@@ -443,7 +792,7 @@
                 <property name="can_focus">True</property>
                 <child>
                   <object class="GtkTextView">
-                    <property name="height_request">400</property>
+                    <property name="height_request">200</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
@@ -463,7 +812,7 @@
                 </child>
                 <child>
                   <object class="GtkTextView">
-                    <property name="height_request">400</property>
+                    <property name="height_request">200</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
