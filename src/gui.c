@@ -3,6 +3,7 @@
 #include "threads.h"
 #include <errno.h>
 #include <assert.h>
+#include <ctype.h>
 
 static GtkWidget* gui_create_window(void);
 
@@ -102,9 +103,31 @@ void gui_dump_memory(void)
         GtkTextBuffer* text_buf = (GtkTextBuffer*)gui_find_widget_child(GTK_WIDGET(simulator.window),
                                                                         text_buf_name);
         // Get memory content
+        char sram_text[SRAM_TEXT_SIZE] = {'\0'};
+        int k = 0;
+        int cur_sram_byte = 0;
+        for (; k < 17 * 8; k++) {
+            if (k % 16 == 0)
+                sram_text[k] = '\n';
+            else if (isprint(simulator.chips[i]->sram[cur_sram_byte]))
+                sram_text[k] = simulator.chips[i]->sram[cur_sram_byte++];
+            else
+                sram_text[k] = ' ';
+        }
+        for (; k < 17 * 9 - 1; k++)
+            sram_text[k] = '_';
+        sram_text[k++] = '\n';
+        while (k < SRAM_TEXT_SIZE) {
+            if (k % 16 == 0)
+                sram_text[k++] = '\n';
+            else {
+                sprintf(sram_text + k, "%02X", simulator.chips[i]->sram[cur_sram_byte++]);
+                k += 2;
+            }
+        }
 
         // Set text
-        ///(void)gtk_text_buffer_set_text(text_buf, data_memory, DATA_MEMORY_SIZE);
+        (void)gtk_text_buffer_set_text(text_buf, sram_text, SRAM_TEXT_SIZE);
 
 
     }

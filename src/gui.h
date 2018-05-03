@@ -4,6 +4,8 @@
 #include <gtk/gtk.h>
 
 // Public
+enum { SRAM_TEXT_SIZE = 17 * 17 };
+
 GtkWidget* gui_configure(int argc, char *argv[]);
 void gui_dump_memory(void);
 GtkWidget* gui_find_widget_child(GtkWidget* parent, const gchar* name);
