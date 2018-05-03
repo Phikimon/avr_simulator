@@ -1,12 +1,10 @@
 CC=gcc
 LD=gcc
 GTKFLAGS=-export-dynamic `pkg-config --cflags --libs gtk+-3.0`
-CFLAGS=-DPATH_TO_GLADE="\"./resources/gui_layout.glade\"" -I$(DEPDIR) -O0 -Wall -Wno-format $(GTKFLAGS)
+CFLAGS=-I$(DEPDIR) -O0 -Wall -Wno-format $(GTKFLAGS)
 LFLAGS=$(GTKFLAGS)
 LIBS=-pthread
 SRCDIR=src
-
-all: tags main
 
 DEPDIR = src
 _DEPS = attiny13.h gui.h gui_pins.h gui_pins_positions.h \
@@ -19,10 +17,12 @@ OBJDIR=obj
 _OBJ = $(_SRCS:.c=.o)
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
+all: $(OBJDIR) tags main
+
 $(OBJDIR):
 	mkdir $(OBJDIR) || true
 
-obj/%.o: src/%.c $(OBJDIR) $(DEPS)
+obj/%.o: src/%.c $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 main: $(OBJ)
@@ -34,6 +34,3 @@ clean:
 
 tags: $(SRCS) $(DEPS)
 	ctags -R
-
-
-
