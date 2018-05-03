@@ -67,7 +67,7 @@ GtkWidget* gui_create_window(void)
     GError* error = NULL;
 
     GtkBuilder* builder = gtk_builder_new();
-    if (!gtk_builder_add_from_file(builder, PATH_TO_GLADE, &error))
+    if (!gtk_builder_add_from_file(builder, "./resources/gui_layout.glade", &error))
     {
         g_critical("Cannot open file: %s", error->message);
         g_error_free(error);
