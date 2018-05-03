@@ -17,7 +17,9 @@ enum pins {
     PINS_NUM,
 
     NOT_ATTINY_PINS_NUM = 3,
-    ATTINY_PINS_NUM = PINS_NUM - NOT_ATTINY_PINS_NUM
+    ATTINY_PINS_NUM = PINS_NUM - NOT_ATTINY_PINS_NUM,
+
+    ONE_CHIP_PINS_NUM = 6
 };
 
 struct gui_pin {
@@ -29,5 +31,7 @@ extern const GtkPoint pins_pos[PINS_NUM];
 
 void pins_connect(const gchar* src_name,
                   const gchar* dest_name);
+
+void gui_refresh_pins_states(void);
 
 #endif
