@@ -49,9 +49,6 @@ void on_draw_area_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
 
 void on_step_pressed(GtkWidget* button, GtkEntry* step_num_widget)
 {
-    printf_gui(simulator.window, "lala");
-    return;
-
     const gchar* text = gtk_entry_get_text(step_num_widget);
     long int step_num = -1;
     int bytes_read = 0;
