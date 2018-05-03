@@ -20,7 +20,6 @@
 
 enum { MAX_STR_LEN = 64 };
 
-
 enum PIN_STATE {
     PIN_LOW  = 0,
     PIN_HIGH = 1,

@@ -103,6 +103,7 @@ void simulator_step(long int step_num)
         //dump_registers();
 
         //refresh_pins_connections();
+        gui_refresh_pins_states();
         //dump_pins_states();
     }
 }
@@ -191,4 +192,3 @@ static void refresh_pins_connections(void)
 #undef SEM_FLUSH
 #undef NOT_LESS_THAN
 #undef EQUAL_TO
-
