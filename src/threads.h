@@ -4,6 +4,7 @@
 #include <sys/sem.h>
 #include <gtk/gtk.h>
 #include "gui_pins.h"
+#include "attiny13.h"
 
 enum {
     FIRST_CHIP  = 0,
