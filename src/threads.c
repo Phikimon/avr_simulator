@@ -5,6 +5,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Declarations
+static void semop_push(struct sembuf* sbuf,
+                       int*           sbuf_counter,
+                       unsigned short num, short val, short flag);
+
+static void semop_flush(struct sembuf* sbuf,
+                        int*           sbuf_counter);
+
+static void* chip_thread(void* chip_ptr);
+static void* gui_thread(void* chips_ptr);
+static void refresh_pins_connections(void);
+
 struct simulator_s simulator;
 
 static int semid = 0;
@@ -17,6 +29,10 @@ do {                                                            \
         exit(1);                                                \
     }                                                           \
 } while (0)
+
+// Definitions
+
+/* Public */
 
 void launch_threads(void)
 {
@@ -43,27 +59,6 @@ void launch_threads(void)
 
 #undef CREATE_THREAD
 
-static void semop_push(struct sembuf* sbuf,
-                       int*           sbuf_counter,
-                       unsigned short num, short val, short flag)
-{
-    sbuf[*sbuf_counter].sem_op  = val;
-    sbuf[*sbuf_counter].sem_flg = flag;
-    sbuf[*sbuf_counter].sem_num = num;
-    (*sbuf_counter)++;
-}
-
-static void semop_flush(struct sembuf* sbuf,
-                        int*           sbuf_counter)
-{
-    int semop_ret = semop(semid, sbuf, *sbuf_counter);
-    if (semop_ret == -1) {
-        perror("semop");
-        exit(1);
-    }
-    *sbuf_counter = 0;
-}
-
 #define SEM_PUSH(NUM, VAL, FLAG)    \
 do {                                \
     semop_push(sbuf, &sbuf_counter, \
@@ -88,39 +83,82 @@ do {                                 \
     SEM_PUSH(NUM, +(VAL), 0);        \
 } while (0)
 
-void* chip_thread(void* chip_ptr)
+void simulator_step(long int step_num)
+{
+    struct sembuf sbuf[SEMBUF_SIZE] = {0};
+    int sbuf_counter = 0;
+
+    refresh_pins_connections();
+    for (int i = 0; i < step_num; i++) {
+
+        SEM_PUSH(FIRST_CHIP,  +1, 0);
+        SEM_PUSH(SECOND_CHIP, +1, 0);
+        SEM_FLUSH();
+        // Just waiting for threads to interpret tick
+        SEM_PUSH(FIRST_CHIP,  0, 0);
+        SEM_PUSH(SECOND_CHIP, 0, 0);
+        SEM_FLUSH();
+
+        //dump_memory();
+        //dump_registers();
+
+        //refresh_pins_connections();
+        //dump_pins_states();
+    }
+}
+
+/* Private */
+
+static void semop_push(struct sembuf* sbuf,
+                       int*           sbuf_counter,
+                       unsigned short num, short val, short flag)
+{
+    sbuf[*sbuf_counter].sem_op  = val;
+    sbuf[*sbuf_counter].sem_flg = flag;
+    sbuf[*sbuf_counter].sem_num = num;
+    (*sbuf_counter)++;
+}
+
+static void semop_flush(struct sembuf* sbuf,
+                        int*           sbuf_counter)
+{
+    int semop_ret = semop(semid, sbuf, *sbuf_counter);
+    if (semop_ret == -1) {
+        perror("semop");
+        exit(1);
+    }
+    *sbuf_counter = 0;
+}
+
+static void* chip_thread(void* chip_ptr)
 {
     struct sembuf sbuf[SEMBUF_SIZE] = {0};
     int sbuf_counter = 0;
     struct attiny13* chip = chip_ptr;
     int number = chip->number;
 
-    SEM_EQUAL_TO(number, +1, WAIT);
-    SEM_FLUSH();
-    //do smth
-    SEM_PUSH(number, -1, 0);
-    SEM_FLUSH();
+    while (1) {
+        SEM_EQUAL_TO(number, +1, WAIT);
+        SEM_FLUSH();
+
+        int e;
+        if ((e = execute_cycle(chip)) != ERR_SUCCESS) {
+            printf_gui(simulator.window,
+                       "Error in execute_cycle: %d", e);
+        }
+
+        SEM_PUSH(number, -1, 0);
+        SEM_FLUSH();
+    }
 
     pthread_exit(0);
 }
 
 
-void* gui_thread(void* chips_ptr)
+static void* gui_thread(void* chips_ptr)
 {
-    struct sembuf sbuf[SEMBUF_SIZE] = {0};
-    int sbuf_counter = 0;
     struct attiny13* chips = (struct attiny13*)chips_ptr;
 
-    SEM_PUSH(FIRST_CHIP,  +1, 0);
-    SEM_PUSH(SECOND_CHIP, +1, 0);
-    SEM_FLUSH();
-    //do smth
-    SEM_PUSH(FIRST_CHIP,   0, 0);
-    SEM_PUSH(SECOND_CHIP,  0, 0);
-    SEM_FLUSH();
-
-    char program_name[] = "avr_ximulator";
-    char* program_name_ptr = ((char*)program_name);
     for (int i = 0; i < ATTINY_PINS_NUM; i++) {
         simulator.pins_connections[i] = PIN_NC;
     }
@@ -129,11 +167,24 @@ void* gui_thread(void* chips_ptr)
         simulator.chips[i]  = &chips[i];
     }
 
+    char program_name[] = "avr_ximulator";
+    char* program_name_ptr = ((char*)program_name);
     simulator.window = (GtkWindow*)gui_configure(1, &program_name_ptr);
 
     gtk_main();
 
     pthread_exit(0);
+}
+
+// Private
+
+static void refresh_pins_connections(void)
+{
+    //Refresh PINB
+    //Put error if short-circuit
+    for (int i = 0; i < ATTINY_PINS_NUM; i++) {
+
+    }
 }
 
 #undef SEM_PUSH

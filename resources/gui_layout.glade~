@@ -237,30 +237,6 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkImage">
-                    <property name="width_request">100</property>
-                    <property name="height_request">80</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="pixbuf">pwr.jpeg</property>
-                  </object>
-                  <packing>
-                    <property name="y">300</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkImage">
-                    <property name="width_request">100</property>
-                    <property name="height_request">80</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="pixbuf">gnd.jpeg</property>
-                  </object>
-                  <packing>
-                    <property name="y">400</property>
-                  </packing>
-                </child>
-                <child>
                   <object class="GtkComboBoxText" id="S_PB2_BOX">
                     <property name="name">S_PB2_BOX</property>
                     <property name="width_request">80</property>
@@ -557,7 +533,7 @@
                   </object>
                   <packing>
                     <property name="x">168</property>
-                    <property name="y">34</property>
+                    <property name="y">32</property>
                   </packing>
                 </child>
                 <child>
@@ -579,6 +555,7 @@
                       <item translatable="yes">GND</item>
                       <item translatable="yes">NC</item>
                     </items>
+                    <signal name="changed" handler="on_combo_box_changed" object="window_main" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">165</property>
@@ -602,8 +579,9 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkButton">
+                      <object class="GtkButton" id="RUN">
                         <property name="label" translatable="yes">RUN</property>
+                        <property name="name">RUN</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -615,8 +593,9 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton">
+                      <object class="GtkButton" id="STOP">
                         <property name="label" translatable="yes">STOP</property>
+                        <property name="name">STOP</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
@@ -632,7 +611,8 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <child>
-                          <object class="GtkEntry">
+                          <object class="GtkEntry" id="STEP_NUM">
+                            <property name="name">STEP_NUM</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                           </object>
@@ -642,12 +622,14 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton">
+                          <object class="GtkButton" id="STEP">
                             <property name="label" translatable="yes">STEP</property>
+                            <property name="name">STEP</property>
                             <property name="width_request">100</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="step" object="STEP_NUM" swapped="no"/>
                           </object>
                           <packing>
                             <property name="resize">True</property>

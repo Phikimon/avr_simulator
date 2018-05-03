@@ -27,7 +27,7 @@ struct gui_pin {
 
 extern const GtkPoint pins_pos[PINS_NUM];
 
-int get_pin_num_by_name(const char* pin_name,
-                        GtkWindow* window);
+void pins_connect(const gchar* src_name,
+                  const gchar* dest_name);
 
 #endif

@@ -1,4 +1,5 @@
 #include "gui_pins.h"
+#include "threads.h"
 #include <string.h>
 
 const GtkPoint pins_pos[PINS_NUM] =
@@ -11,8 +12,7 @@ const GtkPoint pins_pos[PINS_NUM] =
 #undef ALL_PINS
 };
 
-int get_pin_num_by_name(const char* pin_name,
-                        GtkWindow* window)
+static int get_pin_num_by_name(const char* pin_name)
 {
 #define ALL_PINS
 #define PIN(NAME, X_COORD, Y_COORD)          \
@@ -23,6 +23,14 @@ int get_pin_num_by_name(const char* pin_name,
 #undef ALL_PINS
     if (strstr(pin_name, "NC") == pin_name)
         return PIN_NC;
-    printf_gui(window, "Unknown pin");
+    printf_gui(simulator.window, "Unknown pin");
     return PIN_DEFAULT;
 }
+
+void pins_connect(const gchar* src_name, const gchar* dest_name)
+{
+    int src_pin_num  = get_pin_num_by_name(src_name);
+    int dest_pin_num = get_pin_num_by_name(dest_name);
+    simulator.pins_connections[src_pin_num] = dest_pin_num;
+}
+

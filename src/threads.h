@@ -18,10 +18,6 @@ enum {
 
 enum { SEMBUF_SIZE = 16 };
 
-void  launch_threads(void);
-void* chip_thread(void* chip_ptr);
-void* gui_thread(void* chips_ptr);
-
 struct simulator_s {
     GtkWindow* window;
     int pins_connections [ATTINY_PINS_NUM];
@@ -30,6 +26,10 @@ struct simulator_s {
 
 // Global, used in gui_callbacks.c
 extern struct simulator_s simulator;
+
+
+void simulator_step(long int step_num);
+void launch_threads(void);
 
 #undef SEM_PUSH
 #undef SEM_FLUSH
