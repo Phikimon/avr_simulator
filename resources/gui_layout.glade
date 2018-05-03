@@ -3,19 +3,15 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkTextBuffer" id="Registers_1">
-    <property name="name">Registers_1</property>
     <property name="text" translatable="yes">1</property>
   </object>
   <object class="GtkTextBuffer" id="Registers_2">
-    <property name="name">Registers_2</property>
     <property name="text" translatable="yes">2</property>
   </object>
   <object class="GtkTextBuffer" id="Memory_1">
-    <property name="name">Memory_1</property>
     <property name="text" translatable="yes">1</property>
   </object>
   <object class="GtkTextBuffer" id="Memory_2">
-    <property name="name">Memory_2</property>
     <property name="text" translatable="yes">2</property>
   </object>
   <object class="GtkWindow" id="window_main">
