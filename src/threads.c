@@ -99,8 +99,8 @@ void simulator_step(long int step_num)
         SEM_PUSH(SECOND_CHIP, 0, 0);
         SEM_FLUSH();
 
-        //dump_memory();
-        //dump_registers();
+        //gui_dump_memory();
+        //gui_dump_registers();
 
         //refresh_pins_connections();
         gui_refresh_pins_states();

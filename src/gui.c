@@ -1,7 +1,10 @@
 #include "gui.h"
 #include "common.h"
+#include "threads.h"
 #include <errno.h>
 #include <assert.h>
+
+static GtkWidget* gui_create_window(void);
 
 GtkWidget* gui_configure(int argc, char *argv[])
 {
@@ -62,7 +65,7 @@ printf_gui(GtkWindow* window, const char* format, ...)
     gtk_widget_destroy (dialog);
 }
 
-GtkWidget* gui_create_window(void)
+static GtkWidget* gui_create_window(void)
 {
     GError* error = NULL;
 
@@ -83,4 +86,26 @@ GtkWidget* gui_create_window(void)
     g_object_unref(builder);
 
     return window;
+}
+
+void gui_dump_memory(void)
+{
+    for (int i = 0; i < CHIPS_NUM; i++) {
+        // Get text buffer
+        char text_buf_name[MAX_STR_LEN] = "Memory_X";
+        /*
+            0 1 2 3 4 5 6 7
+            V V V V V V V V
+           "M e m o r y _ X"
+         */
+        text_buf_name[7] = i + 1;
+        GtkTextBuffer* text_buf = (GtkTextBuffer*)gui_find_widget_child(GTK_WIDGET(simulator.window),
+                                                                        text_buf_name);
+        // Get memory content
+
+        // Set text
+        ///(void)gtk_text_buffer_set_text(text_buf, data_memory, DATA_MEMORY_SIZE);
+
+
+    }
 }
