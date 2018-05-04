@@ -186,7 +186,8 @@ int gui_refresh_pins_connections(void)
                 strongest_pin_num = pin;
             } else
             if ((STRENGTH(state) == STRENGTH(global_state)) &&
-                (STRENGTH(state) >= STRENGTH_WEAK         )  ) {
+                (STRENGTH(state) >= STRENGTH_WEAK         ) &&
+                (IS_HIGH (state) != IS_HIGH(global_state) ) )  {
                 printf_gui(simulator.window,
                            "Contradiction: pins '%1$s' and '%2$s' both "
                            "have strength '%3$s', but '%1$s' has state "
