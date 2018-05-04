@@ -38,7 +38,7 @@ extern struct simulator_s simulator;
 void simulator_step(long int step_num);
 void simulator_init(void);
 
-void launch_threads(void);
+void launch_threads(int argc, char *argv[]);
 
 void
 shared_printf(const char* format, ...)

@@ -32,10 +32,18 @@ do {                                                            \
 
 // Definitions
 
-void launch_threads(void)
+void launch_threads(int argc, char *argv[])
 {
     pthread_t        gui, chip_pthreads[CHIPS_NUM];
     struct attiny13  chips[CHIPS_NUM] = {0};
+    if (argc != 3) {
+        simulator.is_inited = 0;
+    } else {
+        int ctor_ret1 = attiny13_ctor(simulator.chips[FIRST_CHIP],  argv[1]);
+        int ctor_ret2 = attiny13_ctor(simulator.chips[SECOND_CHIP], argv[2]);
+        if (!ctor_ret1 && !ctor_ret2)
+            simulator.is_inited = 1;
+    }
 
     semid = semget(IPC_PRIVATE, SEM_NUM, IPC_CREAT|0666);
     if (semid == -1) {
@@ -164,7 +172,6 @@ static void* gui_thread(void* chips_ptr)
 {
     struct attiny13* chips = (struct attiny13*)chips_ptr;
 
-    simulator.is_inited = 0;
     for (int i = 0; i < DOCK_PINS_NUM; i++) {
         simulator.pins_conn_mask[i] = (uint32_t)0x00000000;
     }
