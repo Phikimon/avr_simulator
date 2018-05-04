@@ -85,15 +85,20 @@ void on_step_pressed(GtkWidget* button, GtkEntry* step_num_widget)
     long int step_num = -1;
     int bytes_read = -1;
     sscanf(text, "%ld%n", &step_num, &bytes_read);
+    step_num = 1;  ///
     if (bytes_read != strlen((const char*)text)) {
+#ifdef STRICT
         printf_gui(simulator.window, "Invalid step value \"%s\"", text);
-    } else {
-        if (simulator.is_inited == 0) {
-            simulator_init();
-            simulator.is_inited = 1;
-        }
-        simulator_step(step_num);
+        return;
+#else
+        step_num = 1;
+#endif
     }
+    if (simulator.is_inited == 0) {
+        simulator_init();
+        simulator.is_inited = 1;
+    }
+    simulator_step(step_num);
 }
 
 void on_window_main_destroy(void)
