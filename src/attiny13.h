@@ -52,7 +52,7 @@ struct attiny13 {
 
 
 /* Public */
-    int attiny13_ctor           (struct attiny13* chip);
+    int attiny13_ctor           (struct attiny13* chip, const char* filename);
     int execute_cycle           (struct attiny13* chip);
 /* Private */
     int check_interrupt         (struct attiny13* chip);

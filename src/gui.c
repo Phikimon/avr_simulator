@@ -50,7 +50,7 @@ void
 __attribute__((format(printf,2,3)))
 printf_gui(GtkWindow* window, const char* format, ...)
 {
-    char buf[MAX_STR_LEN] = {'\0'};
+    char buf[MAX_STR_LEN << 2] = {'\0'};
 
     va_list args;
     va_start(args,format);
