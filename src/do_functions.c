@@ -158,6 +158,24 @@ DO_FUNC(SUB,
     chip->PC++;
 })
 
+
+DO_FUNC(SUBI,
+{
+    int Rd7 = __Rd >> 7;
+    int K7  = __K  >> 7;
+    __Rd -= __K;
+    int R7 = __Rd >> 7;
+
+    SET_FLAG(SREG_C, (~Rd7 & K7) | (K7 & R7) | (R7 & ~Rd7));
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, R7);
+    SET_FLAG(SREG_V, (Rd7 & ~K7 & ~R7) | (~Rd7 & K7 & R7));
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
+    chip->PC++;
+})
+
+
 DO_FUNC(DEC,
 {
     __Rd--;
