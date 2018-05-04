@@ -45,6 +45,14 @@ static int is_reserved(int8_t offset) {
 #define __A  chip->cmd.args.arg[0]                     //   I/O location address
 #define __b  chip->cmd.args.arg[1]                     //   Bit in the Register File or I/O Register (3-bit)
 
+#define SET_FLAG(FLAG, CONDITION)    \
+do {                                 \
+    if(CONDITION)                    \
+        chip->SREG |=  _BV(FLAG);    \
+    else                             \
+        chip->SREG &= ~_BV(FLAG);    \
+} while (0)
+
 DO_FUNC(IN,
 {
     if (is_reserved(__A))
@@ -84,20 +92,10 @@ DO_FUNC(AND,
 {
     __Rd &= __Rr;
 
-    if (__Rd == 0)
-        chip->SREG |= _BV(SREG_Z);
-    else
-        chip->SREG &= ~_BV(SREG_Z);
-
-    if (__Rd < 0) {                        // S = N ^ V, V = 0 => S = N
-        chip->SREG |= _BV(SREG_N);
-        chip->SREG |= _BV(SREG_S);
-    } else {
-        chip->SREG &= ~_BV(SREG_N);
-        chip->SREG &= ~_BV(SREG_S);
-    }
-
-    chip->SREG &= ~_BV(SREG_V);     // V = 0
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
+    chip->SREG &= ~_BV(SREG_V);    // V = 0
 
     chip->PC++;
 })
@@ -106,20 +104,10 @@ DO_FUNC(OR,
 {
     __Rd |= __Rr;
 
-    if (__Rd == 0)
-        chip->SREG |= _BV(SREG_Z);
-    else
-        chip->SREG &= ~_BV(SREG_Z);
-
-    if (__Rd < 0) {                        // S = N ^ V, V = 0 => S = N
-        chip->SREG |= _BV(SREG_N);
-        chip->SREG |= _BV(SREG_S);
-    } else {
-        chip->SREG &= ~_BV(SREG_N);
-        chip->SREG &= ~_BV(SREG_S);
-    }
-
-    chip->SREG &= ~_BV(SREG_V);     // V = 0
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
+    chip->SREG &= ~_BV(SREG_V);    // V = 0
 
     chip->PC++;
 })
@@ -127,18 +115,13 @@ DO_FUNC(OR,
 DO_FUNC(NEG,
 {
     __Rd = - __Rd;
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_C] = !!__Rd;
-    SREG_bits[SREG_Z] = !__Rd;
-    SREG_bits[SREG_N] = __Rd << 7;
-    SREG_bits[SREG_V] = (__Rd == 0x80); // -128
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = 0; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+
+    SET_FLAG(SREG_C, __Rd);
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_V, __Rd == 0x80); // -128
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
@@ -149,18 +132,13 @@ DO_FUNC(ADD,
     int Rr7 = (__Rr >> 7);
     __Rd += __Rr;
     int R7 = (__Rd >> 7);
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_C] = (Rd7 & Rr7) | (Rr7 & ~R7) | (~R7 & Rd7);
-    SREG_bits[SREG_Z] = !__Rd;
-    SREG_bits[SREG_N] = R7;
-    SREG_bits[SREG_V] = (Rd7 & Rr7 & ~R7) | (~Rd7 & ~Rr7 & R7);
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = 0; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+
+    SET_FLAG(SREG_C, (Rd7 & Rr7) | (Rr7 & ~R7) | (~R7 & Rd7));
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, R7);
+    SET_FLAG(SREG_V, (Rd7 & Rr7 & ~R7) | (~Rd7 & ~Rr7 & R7));
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
@@ -170,52 +148,37 @@ DO_FUNC(SUB,
     int Rr7 = (__Rr >> 7);
     __Rd -= __Rr;
     int R7 = (__Rd >> 7);
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_C] = (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7);
-    SREG_bits[SREG_Z] = !__Rd;
-    SREG_bits[SREG_N] = R7;
-    SREG_bits[SREG_V] = (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7);
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = 0; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+
+    SET_FLAG(SREG_C, (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7));
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, R7);
+    SET_FLAG(SREG_V, (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7));
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
 DO_FUNC(DEC,
 {
     __Rd--;
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_Z] = !__Rd;
-    SREG_bits[SREG_N] = __Rd >> 7;
-    SREG_bits[SREG_V] = (__Rd == 0x7F); // 127
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = SREG_Z; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_V, __Rd == 0x7F); // 127
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
 DO_FUNC(INC,
 {
     __Rd++;
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_Z] = !__Rd;
-    SREG_bits[SREG_N] = __Rd >> 7;
-    SREG_bits[SREG_V] = (__Rd == 0x80); // -128
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = SREG_Z; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_V, __Rd == 0x80); // -128
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
@@ -225,21 +188,38 @@ DO_FUNC(CP,
     int Rd7 = (__Rd >> 7);
     int Rr7 = (__Rr >> 7);
     int R7 = ((__Rd - __Rr) >> 7);
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_C] = (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7);
-    SREG_bits[SREG_Z] = !(__Rd - __Rr);
-    SREG_bits[SREG_N] = R7;
-    SREG_bits[SREG_V] = (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7);
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = 0; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+
+    SET_FLAG(SREG_C, (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7));
+    SET_FLAG(SREG_Z, __Rd == __Rr);
+    SET_FLAG(SREG_N, R7);
+    SET_FLAG(SREG_V, (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7));
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
+
+DO_FUNC(CPI,
+{
+    int Rd7 = (__Rd >> 7);
+    int K7 = (__K >> 7);
+    int R7 = ((__Rd - __K) >> 7);
+
+    SET_FLAG(SREG_C, (~Rd7 & K7) | (K7 & R7) | (R7 & ~Rd7));
+    SET_FLAG(SREG_Z, __Rd == __K);
+    SET_FLAG(SREG_N, R7);
+    SET_FLAG(SREG_V, (Rd7 & ~K7 & ~R7) | (~Rd7 & K7 & R7));
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
+    chip->PC++;
+})
+
+
+DO_FUNC(LDI,
+{
+    __Rd = __K;
+    chip->PC++;
+})
 DO_FUNC(MOV,
 {
     __Rd = __Rr;
@@ -262,60 +242,42 @@ DO_FUNC(SER,
 
 DO_FUNC(TST,
 {
-    if(__Rd == 0)
-        chip->SREG |= _BV(SREG_Z);
-    else
-        chip->SREG &= ~_BV(SREG_Z);
-    if (__Rd < 0) {                        // S = N ^ V, V = 0 => S = N
-        chip->SREG |= _BV(SREG_N);
-        chip->SREG |= _BV(SREG_S);
-    } else {
-        chip->SREG &= ~_BV(SREG_N);
-        chip->SREG &= ~_BV(SREG_S);
-    }
-    chip->SREG &= ~_BV(SREG_V);
+
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
+    chip->SREG &= ~_BV(SREG_V);    // V = 0
+
     chip->PC++;
 })
 
 
 DO_FUNC(LSR,
 {
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_C] = __Rd & 0x01;
+    SET_FLAG(SREG_C, __Rd & 0x01);
 
     __Rd >>= 1;
 
-    SREG_bits[SREG_Z] = !!__Rd;
-    SREG_bits[SREG_N] = 0;
-    SREG_bits[SREG_V] = SREG_bits[SREG_N] ^ SREG_bits[SREG_C];
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = 0; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+    SET_FLAG(SREG_Z, __Rd == 0);
+    chip->SREG &= ~_BV(SREG_N);
+    SET_FLAG(SREG_V, GET_FLAG_N ^ GET_FLAG_C);
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
 
 DO_FUNC(LSL,
 {
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_C] = (__Rd >> 7) & 0x01;
+    SET_FLAG(SREG_C, (__Rd >> 7) & 0x01);
 
     __Rd <<= 1;
 
-    SREG_bits[SREG_Z] = !!__Rd;
-    SREG_bits[SREG_N] = __Rd >> 7;
-    SREG_bits[SREG_V] = SREG_bits[SREG_N] ^ SREG_bits[SREG_C];
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = 0; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_V, GET_FLAG_N ^ GET_FLAG_C);
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
     chip->PC++;
 })
 
@@ -452,31 +414,6 @@ DO_FUNC(BRID,
     DO_CONDITIONAL_BRANCH(GET_FLAG_I == 0);
 })
 
-DO_FUNC(CPI,
-{
-    int Rd7 = (__Rd >> 7);
-    int K7 = (__K >> 7);
-    int R7 = ((__Rd - __K) >> 7);
-    int SREG_bits[5] = {0};
-    SREG_bits[SREG_C] = (~Rd7 & K7) | (K7 & R7) | (R7 & ~Rd7);
-    SREG_bits[SREG_Z] = !(__Rd - __K);
-    SREG_bits[SREG_N] = R7;
-    SREG_bits[SREG_V] = (Rd7 & ~K7 & ~R7) | (~Rd7 & K7 & R7);
-    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
-    for (int i = 0; i < 5; i++) {
-        if (SREG_bits[i])
-            chip->SREG |= _BV(i);
-        else
-            chip->SREG &= ~_BV(i);
-    }
-    chip->PC++;
-})
-
-DO_FUNC(LDI,
-{
-    __Rd = __K;
-    chip->PC++;
-})
 
 DO_FUNC(NOP,
 {
@@ -576,11 +513,11 @@ DO_FUNC(LPM,
 
 
 
-
-
 #undef DO_FUNC
 #undef __Rd
 #undef __Rr
+#undef __K
+#undef __k
 #undef __A
 #undef __b
-#undef __k
+#undef SET_FLAG
