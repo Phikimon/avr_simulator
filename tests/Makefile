@@ -1,5 +1,5 @@
 CC=avr-gcc
-CFLAGS=-mmcu=attiny13a -Os -static
+CFLAGS=-mmcu=attiny13a -O1 -static
 
 all: blink.bin receive.bin
 
