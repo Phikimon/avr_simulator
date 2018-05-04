@@ -129,6 +129,20 @@ DO_FUNC(OR,
     chip->PC++;
 })
 
+
+DO_FUNC(ORI,
+{
+    __Rd |= __K;
+
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
+    chip->SREG &= ~_BV(SREG_V);    // V = 0
+
+    chip->PC++;
+})
+
+
 DO_FUNC(NEG,
 {
     __Rd = - __Rd;
