@@ -305,7 +305,7 @@ DO_FUNC(PUSH,
         return ERR_SUCCESS;
     if (chip->SPL < (REGISTERS_NUM + IO_REGISTERS_NUM))
         return ERR_STACK_OVERFLOW;
-    chip->data_memory[chip->SPL--] = __Rr;
+    chip->data_memory[chip->SPL--] = __Rd;
     chip->PC++;
 })
 
@@ -315,7 +315,7 @@ DO_FUNC(POP,
         return ERR_SUCCESS;
     if (chip->SPL >= DATA_MEMORY_SIZE - 1)
        return ERR_EMPTY_STACK;
-    __Rr = chip->data_memory[++chip->SPL];
+    __Rd = chip->data_memory[++chip->SPL];
     chip->PC++;
 })
 
