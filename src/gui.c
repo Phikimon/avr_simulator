@@ -128,7 +128,7 @@ void gui_dump_memory(void)
             if (k % LINE_LENGTH == LINE_LENGTH - 1)
                 sram_text[k++] = '\n';
             else {
-                sprintf(sram_text + k, "%02X", simulator.chips[i]->sram[cur_sram_byte++]);
+                sprintf(sram_text + k, "%02hX", (uint8_t)simulator.chips[i]->sram[cur_sram_byte++]);
                 k += 2;
             }
         }
@@ -156,13 +156,13 @@ void gui_dump_registers(void)
         const int TEXT_SIZE = LINE_LENGTH * REGISTERS_NUM / 2 + sizeof((char)'\0');  // 2 registers in one line
         char registers_text[TEXT_SIZE];
         for (int k = 0; k < REGISTERS_NUM / 2; k++)
-            sprintf(registers_text + k * LINE_LENGTH, "R%2d = %02X;   R%2d = %02X;\n",
-                    k,                     simulator.chips[i]->registers[k],
-                    k + REGISTERS_NUM / 2, simulator.chips[i]->registers[k + REGISTERS_NUM / 2]);
+            sprintf(registers_text + k * LINE_LENGTH, "R%2d = %02hX;   R%2d = %02hX;\n",
+                    k,                     (uint8_t)simulator.chips[i]->registers[k],
+                    k + REGISTERS_NUM / 2, (uint8_t)simulator.chips[i]->registers[k + REGISTERS_NUM / 2]);
 
         registers_text[TEXT_SIZE - 1] = ' ';
 
         // Set text
-        (void)gtk_text_buffer_set_text(text_buf, registers_text, TEXT_SIZE);
+        (void)gtk_text_buffer_set_text(text_buf, registers_text, TEXT_SIZE - 1);
     }
 }
