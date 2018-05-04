@@ -1,10 +1,12 @@
 #include "gui.h"
 #include "common.h"
 #include "threads.h"
+
 #include <errno.h>
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
 static GtkWidget* gui_create_window(void);
 
@@ -224,7 +226,8 @@ void gui_obj_dump(void)
         fseek(obj_dump_file, 0, SEEK_END);
         int file_size = ftell(obj_dump_file);
         rewind(obj_dump_file);
-        char text[file_size];
+        char* text = (char*)calloc(file_size, sizeof(char));
+        assert(text);
         fread(text, sizeof(char), file_size, obj_dump_file);
         fclose(obj_dump_file);
 

@@ -91,6 +91,7 @@ do {                                 \
 
 void simulator_step(long int step_num)
 {
+    static int step = 0;
     struct sembuf sbuf[SEMBUF_SIZE] = {0};
     int sbuf_counter = 0;
 
@@ -98,6 +99,7 @@ void simulator_step(long int step_num)
         return;
     gui_refresh_pins_states();
     for (int i = 0; i < step_num; i++) {
+        printf("\nstep = %d\n", step);
         SEM_PUSH(FIRST_CHIP,  +1, 0);
         SEM_PUSH(SECOND_CHIP, +1, 0);
         SEM_FLUSH();
@@ -113,6 +115,7 @@ void simulator_step(long int step_num)
         gui_dump_memory();
         gui_dump_registers();
         gui_obj_dump();
+        step++;
         //dump_pins_states();
     }
 }
@@ -156,8 +159,9 @@ static void* chip_thread(void* chip_ptr)
 
         int e;
         if ((e = execute_cycle(chip)) != ERR_SUCCESS) {
-            shared_printf("Error in thread %d in"
-                          " execute_cycle: %d. Aborting\n", e);
+            shared_printf("\nError in thread %d in"
+                          " execute_cycle: %s. Aborting\n",
+                            number, ERRS_TEXT[e]);
             exit(1);
         }
 
