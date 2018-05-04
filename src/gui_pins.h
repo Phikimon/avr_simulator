@@ -31,6 +31,21 @@ enum pin {
       (pin == PIN_DOCK_4) || \
       (pin == PIN_DOCK_5) )
 
+#define IS_ATTINY_PIN(pin)    \
+    ( (pin == PIN_F_PB0)   || \
+      (pin == PIN_F_PB1)   || \
+      (pin == PIN_F_PB2)   || \
+      (pin == PIN_F_PB3)   || \
+      (pin == PIN_F_PB4)   || \
+      (pin == PIN_F_RESET) || \
+                              \
+      (pin == PIN_S_PB0)   || \
+      (pin == PIN_S_PB1)   || \
+      (pin == PIN_S_PB2)   || \
+      (pin == PIN_S_PB3)   || \
+      (pin == PIN_S_PB4)   || \
+      (pin == PIN_S_RESET) )
+
 struct gui_pin {
     GtkPoint point;
     int num;
@@ -44,5 +59,6 @@ int get_pin_num_by_name(const char* pin_name);
 
 const char* get_pin_name_by_num(int num);
 
+int gui_refresh_pins_connections(void);
 
 #endif

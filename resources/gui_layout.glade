@@ -688,6 +688,7 @@
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
                     <property name="buffer">Registers_1</property>
+                    <property name="monospace">True</property>
                   </object>
                 </child>
                 <child type="tab">
@@ -708,6 +709,7 @@
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
                     <property name="buffer">Registers_2</property>
+                    <property name="monospace">True</property>
                   </object>
                   <packing>
                     <property name="position">1</property>
@@ -749,6 +751,7 @@
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
                     <property name="buffer">Memory_1</property>
+                    <property name="monospace">True</property>
                   </object>
                 </child>
                 <child type="tab">
@@ -769,6 +772,7 @@
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
                     <property name="buffer">Memory_2</property>
+                    <property name="monospace">True</property>
                   </object>
                   <packing>
                     <property name="position">1</property>

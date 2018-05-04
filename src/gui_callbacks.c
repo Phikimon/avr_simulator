@@ -20,16 +20,14 @@ void on_pin_clicked(GtkWidget* pin)
 
     static enum pin old_pin_num = PIN_DEFAULT;
 
-    if (old_pin_num == PIN_DEFAULT) {
+    int same_pin = (old_pin_num == pin_num);
+    int one_pin_is_dock = IS_DOCK_PIN(old_pin_num) ^ IS_DOCK_PIN(pin_num);
+    int ok = (!same_pin) && (one_pin_is_dock) && (old_pin_num != PIN_DEFAULT);
+
+    if (!ok) {
         old_pin_num = pin_num;
         return;
     }
-
-    int same_pin = (old_pin_num == pin_num);
-    int one_pin_is_dock = IS_DOCK_PIN(old_pin_num) ^ IS_DOCK_PIN(pin_num);
-    int ok = (!same_pin) && (one_pin_is_dock);
-    if (!ok)
-        goto reset_choice;
 
     enum pin src_pin, dock_pin;
     if (IS_DOCK_PIN(old_pin_num)) {
@@ -43,10 +41,12 @@ void on_pin_clicked(GtkWidget* pin)
     if (simulator.pins_conn_mask[dock_pin] & _BV(src_pin)) {
         simulator.pins_conn_mask[dock_pin] &= ~_BV(src_pin);
     } else {
+        for (int i = PIN_DOCK_0; i < PIN_DOCK_0 + DOCK_PINS_NUM; i++) {
+            simulator.pins_conn_mask[i] &= ~_BV(src_pin);
+        }
         simulator.pins_conn_mask[dock_pin] |= _BV(src_pin);
     }
 
-reset_choice:
     old_pin_num = PIN_DEFAULT;
     //Force redraw
     GtkWidget* draw_area = gui_find_widget_child(GTK_WIDGET(simulator.window),
@@ -80,6 +80,11 @@ void on_draw_area_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
 
 void on_step_pressed(GtkWidget* button, GtkEntry* step_num_widget)
 {
+    gui_refresh_pins_connections();
+    gui_refresh_pins_states();
+    return;
+
+
     const gchar* text = gtk_entry_get_text(step_num_widget);
     long int step_num = -1;
     int bytes_read = 0;

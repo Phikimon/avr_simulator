@@ -15,7 +15,6 @@ static void semop_flush(struct sembuf* sbuf,
 
 static void* chip_thread(void* chip_ptr);
 static void* gui_thread(void* chips_ptr);
-static void refresh_pins_connections(void);
 
 struct simulator_s simulator;
 
@@ -31,8 +30,6 @@ do {                                                            \
 } while (0)
 
 // Definitions
-
-/* Public */
 
 void launch_threads(void)
 {
@@ -88,7 +85,7 @@ void simulator_step(long int step_num)
     struct sembuf sbuf[SEMBUF_SIZE] = {0};
     int sbuf_counter = 0;
 
-    refresh_pins_connections();
+    gui_refresh_pins_connections();
     for (int i = 0; i < step_num; i++) {
 
         SEM_PUSH(FIRST_CHIP,  +1, 0);
@@ -177,16 +174,6 @@ static void* gui_thread(void* chips_ptr)
     pthread_exit(0);
 }
 
-// Private
-
-static void refresh_pins_connections(void)
-{
-    //Refresh PINB
-    //Put error if short-circuit
-    for (int i = 0; i < ATTINY_PINS_NUM; i++) {
-
-    }
-}
 
 #undef SEM_PUSH
 #undef SEM_FLUSH

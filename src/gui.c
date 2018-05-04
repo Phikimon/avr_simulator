@@ -33,6 +33,7 @@ GtkWidget* gui_find_widget_child(GtkWidget* parent, const gchar* name)
 
     if (GTK_IS_CONTAINER(parent)) {
         GList *children = gtk_container_get_children(GTK_CONTAINER(parent));
+        if (!children) return NULL;
         do {
             GtkWidget* widget = gui_find_widget_child(children->data, name);
             if (widget != NULL) {
@@ -48,7 +49,7 @@ void
 __attribute__((format(printf,2,3)))
 printf_gui(GtkWindow* window, const char* format, ...)
 {
-    char buf[MAX_STR_LEN] = {'\0'};
+    char buf[MAX_STR_LEN << 2] = {'\0'};
 
     va_list args;
     va_start(args,format);
