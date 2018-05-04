@@ -68,13 +68,16 @@ do {                                                             \
     INSTRUCTION ( SBI   , ((cmd & 0xFF00) == 0x9A00) ,     2    , FILL_ARGS_CBI_SBI    )
 
     INSTRUCTION ( AND   , ((cmd & 0xFC00) == 0x2000) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( ANDI  , ((cmd & 0xF000) == 0x7000) ,     1    , FILL_ARGS_Rd_K       )
     INSTRUCTION ( OR    , ((cmd & 0xFC00) == 0x2800) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( NEG   , ((cmd & 0xFC00) == 0x9401) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( ADD   , ((cmd & 0xFC00) == 0x0C00) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( SUB   , ((cmd & 0xFC00) == 0x1800) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( SUBI  , ((cmd & 0xF000) == 0x5000) ,     1    , FILL_ARGS_Rd_K       )
     INSTRUCTION ( DEC   , ((cmd & 0xFC00) == 0x940A) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( INC   , ((cmd & 0xFC00) == 0x9403) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( CP    , ((cmd & 0xFC00) == 0x1400) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( CPI   , ((cmd & 0xF000) == 0x3000) ,     1    , FILL_ARGS_Rd_K       )
     INSTRUCTION ( MOV   , ((cmd & 0xFC00) == 0x2C00) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( CLR   , ((cmd & 0xFC00) == 0x2400) ,     1    , FILL_ARGS_LONG_Rd    )
     INSTRUCTION ( SER   , ((cmd & 0xFF0F) == 0xEF0F) ,     1    , FILL_ARGS_SER        )
@@ -88,6 +91,7 @@ do {                                                             \
     INSTRUCTION ( LD_X  , ((cmd & 0xFE0F) == 0x900C) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( LD_Y  , ((cmd & 0xFE0F) == 0x8008) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( LD_Z  , ((cmd & 0xFE0F) == 0x8000) ,     1    , FILL_ARGS_Rd_ONLY    )
+    INSTRUCTION ( LDI   , ((cmd & 0xF000) == 0xE000) ,     1    , FILL_ARGS_Rd_K       )
 
     INSTRUCTION ( ST_X  , ((cmd & 0xFE0F) == 0x920C) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( ST_Y  , ((cmd & 0xFE0F) == 0x8208) ,     2    , FILL_ARGS_Rd_ONLY    )
@@ -114,10 +118,6 @@ do {                                                             \
     INSTRUCTION ( BRVC  , ((cmd & 0xFC07) == 0xF403) ,     2    , FILL_ARGS_BRANCH     )
     INSTRUCTION ( BRIE  , ((cmd & 0xFC07) == 0xF007) ,     2    , FILL_ARGS_BRANCH     )
     INSTRUCTION ( BRID  , ((cmd & 0xFC07) == 0xF407) ,     2    , FILL_ARGS_BRANCH     )
-
-
-    INSTRUCTION ( CPI   , ((cmd & 0xF000) == 0x3000) ,     1    , FILL_ARGS_Rd_K       )
-    INSTRUCTION ( LDI   , ((cmd & 0xF000) == 0xE000) ,     1    , FILL_ARGS_Rd_K       )
 
     INSTRUCTION ( NOP   , ((cmd & 0xFFFF) == 0x0000) ,     1    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( RET   , ((cmd & 0xFFFF) == 0x9508) ,     4    , FILL_ARGS_NO_ARGS    )

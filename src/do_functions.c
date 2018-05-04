@@ -53,6 +53,7 @@ do {                                 \
         chip->SREG &= ~_BV(FLAG);    \
 } while (0)
 
+
 DO_FUNC(IN,
 {
     if (is_reserved(__A))
@@ -61,6 +62,7 @@ DO_FUNC(IN,
         __Rd = chip->io_registers[__A];
     chip->PC++;
 })
+
 
 DO_FUNC(OUT,
 {
@@ -79,6 +81,7 @@ DO_FUNC(CBI,
     chip->PC++;
 })
 
+
 DO_FUNC(SBI,
 {
     if (chip->cmd.progress == 1)
@@ -87,6 +90,7 @@ DO_FUNC(SBI,
         chip->io_registers[__A] |= _BV(__b);
     chip->PC++;
 })
+
 
 DO_FUNC(AND,
 {
@@ -99,6 +103,19 @@ DO_FUNC(AND,
 
     chip->PC++;
 })
+
+DO_FUNC(ANDI,
+{
+    __Rd &= __K;
+
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
+    chip->SREG &= ~_BV(SREG_V);    // V = 0
+
+    chip->PC++;
+})
+
 
 DO_FUNC(OR,
 {
