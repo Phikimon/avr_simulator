@@ -46,6 +46,7 @@ void on_pin_clicked(GtkWidget* pin)
         }
         simulator.pins_conn_mask[dock_pin] |= _BV(src_pin);
     }
+    gui_refresh_pins_states();
 
     old_pin_num = PIN_DEFAULT;
     //Force redraw
