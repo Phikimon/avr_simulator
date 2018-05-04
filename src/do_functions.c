@@ -38,12 +38,12 @@ static int is_reserved(int8_t offset) {
     }
 }
 
-#define __Rd chip->registers[chip->cmd.args.arg[1]]
-#define __Rr chip->registers[chip->cmd.args.arg[0]]
-#define __A  chip->cmd.args.arg[0]
-#define __b  chip->cmd.args.arg[1]
-#define __k  chip->cmd.args.addr
-#define __K  chip->cmd.args.arg[0]
+#define __Rd chip->registers[chip->cmd.args.arg[1]]    //   Destination (and source) register in the Register File
+#define __Rr chip->registers[chip->cmd.args.arg[0]]    //   Source register in the Register File
+#define __K  chip->cmd.args.arg[0]                     //   Constant data
+#define __k  chip->cmd.args.addr                       //   Constant address
+#define __A  chip->cmd.args.arg[0]                     //   I/O location address
+#define __b  chip->cmd.args.arg[1]                     //   Bit in the Register File or I/O Register (3-bit)
 
 DO_FUNC(IN,
 {
