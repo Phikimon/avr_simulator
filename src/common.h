@@ -36,12 +36,13 @@ enum PINS {
 };
 
 // SIZES CONSTANTS
-enum { REGISTERS_NUM       = 32 }; // 0x20
-enum { IO_REGISTERS_NUM    = 64 }; // 0x40
-enum { SRAM_SIZE           = 64 }; // 0x40
-enum { DATA_MEMORY_SIZE    = REGISTERS_NUM    +
-                             IO_REGISTERS_NUM +
-                             SRAM_SIZE };
+enum { REGISTERS_NUM            = 32 }; // 0x20
+enum { IO_REGISTERS_NUM         = 64 }; // 0x40
+enum { NOT_RESERVED_IO_REGS_NUM = 35 };
+enum { SRAM_SIZE                = 64 }; // 0x40
+enum { DATA_MEMORY_SIZE         = REGISTERS_NUM    +
+                                  IO_REGISTERS_NUM +
+                                  SRAM_SIZE };
 enum { PIN_INT0 = PB1 };
 enum { FLASH_MEMORY_SIZE   = 0x0200 }; // 512
 enum { PIN_NUM             = 6 };
