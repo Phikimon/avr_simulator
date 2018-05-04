@@ -82,7 +82,7 @@ DO_FUNC(SBI,
 
 DO_FUNC(AND,
 {
-    __Rd = __Rd & __Rr;
+    __Rd &= __Rr;
 
     if (__Rd == 0)
         chip->SREG |= _BV(SREG_Z);
@@ -104,7 +104,7 @@ DO_FUNC(AND,
 
 DO_FUNC(OR,
 {
-    __Rd = __Rd | __Rr;
+    __Rd |= __Rr;
 
     if (__Rd == 0)
         chip->SREG |= _BV(SREG_Z);
@@ -147,7 +147,7 @@ DO_FUNC(ADD,
 {
     int Rd7 = (__Rd >> 7);
     int Rr7 = (__Rr >> 7);
-    __Rd = __Rd + __Rr;
+    __Rd += __Rr;
     int R7 = (__Rd >> 7);
     int SREG_bits[5] = {0};
     SREG_bits[SREG_C] = (Rd7 & Rr7) | (Rr7 & ~R7) | (~R7 & Rd7);
@@ -168,7 +168,7 @@ DO_FUNC(SUB,
 {
     int Rd7 = (__Rd >> 7);
     int Rr7 = (__Rr >> 7);
-    __Rd = __Rd - __Rr;
+    __Rd -= __Rr;
     int R7 = (__Rd >> 7);
     int SREG_bits[5] = {0};
     SREG_bits[SREG_C] = (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7);
@@ -187,7 +187,7 @@ DO_FUNC(SUB,
 
 DO_FUNC(DEC,
 {
-    __Rd = __Rd - 1;
+    __Rd--;
     int SREG_bits[5] = {0};
     SREG_bits[SREG_Z] = !__Rd;
     SREG_bits[SREG_N] = __Rd >> 7;
@@ -204,7 +204,7 @@ DO_FUNC(DEC,
 
 DO_FUNC(INC,
 {
-    __Rd = __Rd + 1;
+    __Rd++;
     int SREG_bits[5] = {0};
     SREG_bits[SREG_Z] = !__Rd;
     SREG_bits[SREG_N] = __Rd >> 7;
