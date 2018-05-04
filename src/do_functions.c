@@ -126,6 +126,12 @@ DO_FUNC(ORI,
     DO_LOGIC_INSTRUCTION;
 })
 
+DO_FUNC(EOR,
+{
+    __Rd ^= chip->registers[chip->cmd.args.arg[0] & 0x03];   // r <= 3
+    DO_LOGIC_INSTRUCTION;
+})
+
 #undef DO_LOGIC_INSTRUCTION
 
 DO_FUNC(NEG,

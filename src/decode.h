@@ -71,6 +71,7 @@ do {                                                             \
     INSTRUCTION ( ANDI  , ((cmd & 0xF000) == 0x7000) ,     1    , FILL_ARGS_Rd_K       )
     INSTRUCTION ( OR    , ((cmd & 0xFC00) == 0x2800) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( ORI   , ((cmd & 0xF000) == 0x6000) ,     1    , FILL_ARGS_Rd_K       )
+    INSTRUCTION ( EOR   , ((cmd & 0xFC00) == 0x2400) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( NEG   , ((cmd & 0xFC00) == 0x9401) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( ADD   , ((cmd & 0xFC00) == 0x0C00) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( SUB   , ((cmd & 0xFC00) == 0x1800) ,     1    , FILL_ARGS_ALU        )
