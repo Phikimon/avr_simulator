@@ -299,6 +299,27 @@ DO_FUNC(LSR,
 })
 
 
+DO_FUNC(LSL,
+{
+    int SREG_bits[5] = {0};
+    SREG_bits[SREG_C] = (__Rd >> 7) & 0x01;
+
+    __Rd <<= 1;
+
+    SREG_bits[SREG_Z] = !!__Rd;
+    SREG_bits[SREG_N] = __Rd >> 7;
+    SREG_bits[SREG_V] = SREG_bits[SREG_N] ^ SREG_bits[SREG_C];
+    SREG_bits[SREG_S] = SREG_bits[SREG_N] ^ SREG_bits[SREG_V];
+    for (int i = 0; i < 5; i++) {
+        if (SREG_bits[i])
+            chip->SREG |= _BV(i);
+        else
+            chip->SREG &= ~_BV(i);
+    }
+    chip->PC++;
+})
+
+
 DO_FUNC(PUSH,
 {
     if (chip->cmd.progress == 1)

@@ -80,6 +80,7 @@ do {                                                             \
     INSTRUCTION ( SER   , ((cmd & 0xFF0F) == 0xEF0F) ,     1    , FILL_ARGS_SER        )
     INSTRUCTION ( TST   , ((cmd & 0xFC00) == 0x2000) ,     1    , FILL_ARGS_LONG_D     )
     INSTRUCTION ( LSR   , ((cmd & 0xFE0F) == 0x9406) ,     1    , FILL_ARGS_RD_ONLY    )
+    INSTRUCTION ( LSL   , ((cmd & 0xFC00) == 0x0C00) ,     1    , FILL_ARGS_LONG_D     )
 
     INSTRUCTION ( PUSH  , ((cmd & 0xFE0F) == 0x920F) ,     2    , FILL_ARGS_RD_ONLY    )
     INSTRUCTION ( POP   , ((cmd & 0xFE0F) == 0x900F) ,     2    , FILL_ARGS_RD_ONLY    )
