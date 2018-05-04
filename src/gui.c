@@ -15,7 +15,7 @@ GtkWidget* gui_configure(int argc, char *argv[])
     GtkCssProvider* css = gtk_css_provider_new();
     (void)gtk_css_provider_load_from_data(css,
                           "GtkTextView, textview {"
-                                   "font-family: 'Oxygen Mono Regular', monospace;"
+                                   "font-family: 'MonoSpace', monospace;"
                           "}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                               GTK_STYLE_PROVIDER(css), 1);
@@ -128,7 +128,7 @@ void gui_dump_memory(void)
             else if (isprint(simulator.chips[i]->sram[cur_sram_byte]))
                 sram_text[k] = simulator.chips[i]->sram[cur_sram_byte++];
             else
-                sram_text[k] = ' ';
+                sram_text[k] = '.';
         }
         for (; k < 17 * 9 - 1; k++)     // Separation line
             sram_text[k] = '_';
