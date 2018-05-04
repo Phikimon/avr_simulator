@@ -156,7 +156,7 @@ void gui_dump_registers(void)
         const int TEXT_SIZE = LINE_LENGTH * REGISTERS_NUM / 2 + sizeof((char)'\0');  // 2 registers in one line
         char registers_text[TEXT_SIZE];
         for (int k = 0; k < REGISTERS_NUM / 2; k++)
-            sprintf(registers_text + k * LINE_LENGTH, "R%2d = %02hX;   R%2d = %02hX;\n",
+            sprintf(registers_text + k * LINE_LENGTH, "R%-2d = %02hX;   R%-2d = %02hX;\n",
                     k,                     (uint8_t)simulator.chips[i]->registers[k],
                     k + REGISTERS_NUM / 2, (uint8_t)simulator.chips[i]->registers[k + REGISTERS_NUM / 2]);
 
