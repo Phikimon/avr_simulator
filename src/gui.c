@@ -227,6 +227,7 @@ void gui_obj_dump(void)
         int file_size = ftell(obj_dump_file);
         rewind(obj_dump_file);
         char* text = (char*)calloc(file_size, sizeof(char));
+        assert(text);
         fread(text, sizeof(char), file_size, obj_dump_file);
         fclose(obj_dump_file);
 
