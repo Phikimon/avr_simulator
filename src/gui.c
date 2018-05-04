@@ -16,6 +16,7 @@ GtkWidget* gui_configure(int argc, char *argv[])
     (void)gtk_css_provider_load_from_data(css,
                           "GtkTextView, textview {"
                                    "font-family: 'MonoSpace', monospace;"
+                                   "font-size: 10;"
                           "}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                               GTK_STYLE_PROVIDER(css), 1);
@@ -200,5 +201,34 @@ void gui_dump_registers(void)
 
         // Set text
         (void)gtk_text_buffer_set_text(text_buf, registers_text, TEXT_SIZE - 1);
+    }
+}
+
+void gui_obj_dump(void)
+{
+    for (int i = 0; i < CHIPS_NUM; i++) {
+        // Get text buffer
+        char text_view_name[MAX_STR_LEN] = "Disasm_X";
+        text_view_name[7] = '0' + i + 1;
+        GtkTextView* text_view = (GtkTextView*)gui_find_widget_child(GTK_WIDGET(simulator.window),
+                                                                     text_view_name);
+        assert(text_view);
+        GtkTextBuffer* text_buf = gtk_text_view_get_buffer(text_view);
+        assert(text_buf);
+
+        // Get text
+        char obj_dump_file_name[MAX_STR_LEN] = "tests/objdump_X";
+        obj_dump_file_name[14] =  '0' + i + 1;
+        FILE* obj_dump_file = fopen(obj_dump_file_name, "r");
+        assert(obj_dump_file);
+        fseek(obj_dump_file, 0, SEEK_END);
+        int file_size = ftell(obj_dump_file);
+        rewind(obj_dump_file);
+        char text[file_size];
+        fread(text, sizeof(char), file_size, obj_dump_file);
+        fclose(obj_dump_file);
+
+        // Set text
+        (void)gtk_text_buffer_set_text(text_buf, text, file_size);
     }
 }

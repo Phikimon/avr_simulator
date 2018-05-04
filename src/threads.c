@@ -112,6 +112,7 @@ void simulator_step(long int step_num)
 
         gui_dump_memory();
         gui_dump_registers();
+        gui_obj_dump();
         //dump_pins_states();
     }
 }
