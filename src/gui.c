@@ -194,8 +194,9 @@ void gui_dump_registers(void)
 #undef RESERVED_REGISTER
 #undef IO_REGISTER
 
-        for(int j = k * LINE_LENGTH + len; j < TEXT_SIZE; j++)
-            registers_text[j] = ' ';
+        sprintf(registers_text + k * LINE_LENGTH + len, "   %-6s = %02hX;",
+                            "PC", simulator.chips[i]->PC);
+        k++;
 
         // Set text
         (void)gtk_text_buffer_set_text(text_buf, registers_text, TEXT_SIZE - 1);
