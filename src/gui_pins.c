@@ -139,7 +139,7 @@ static enum pin_state get_pin_state(int pin)
     enum pin_state state = STATE_HI_Z;
 
     if (IS_ATTINY_PIN(pin)) {
-        get_attiny_pin_state(pin);
+        state = get_attiny_pin_state(pin);
     } else
     if (pin == PIN_VCC) {
         state = STATE_STRONG_HIGH;
@@ -153,6 +153,20 @@ static enum pin_state get_pin_state(int pin)
 
 int gui_refresh_pins_connections(void)
 {
+    //Zero pass - initialize PINB values
+    for (int pin = 0; pin < ATTINY_PINS_NUM; pin++) {
+        int chip_num = pin / ONE_CHIP_PINS_NUM;
+        int pin_num  = pin % ONE_CHIP_PINS_NUM;
+
+        enum pin_state state = get_attiny_pin_state(pin);
+        if (IS_HIGH(state)) {
+            simulator.chips[chip_num]->PINB |= _BV(pin_num);
+        } else {
+            simulator.chips[chip_num]->PINB &= ~_BV(pin_num);
+        }
+    }
+
+
     for (int dock_pin = PIN_DOCK_0;
          dock_pin < PIN_DOCK_0 + DOCK_PINS_NUM;
          dock_pin++) {
