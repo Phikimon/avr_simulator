@@ -79,21 +79,9 @@ void on_draw_area_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
     cairo_surface_destroy(s);
 }
 
-void on_step_pressed(GtkWidget* button, GtkEntry* step_num_widget)
+void on_step_pressed(GtkWidget* button, GtkSpinButton* step_num_widget)
 {
-    const gchar* text = gtk_entry_get_text(step_num_widget);
-    long int step_num = -1;
-    int bytes_read = -1;
-    sscanf(text, "%ld%n", &step_num, &bytes_read);
-    step_num = 1;  ///
-    if (bytes_read != strlen((const char*)text)) {
-#ifdef STRICT
-        printf_gui(simulator.window, "Invalid step value \"%s\"", text);
-        return;
-#else
-        step_num = 1;
-#endif
-    }
+    gint step_num = gtk_spin_button_get_value_as_int(step_num_widget);
     if (simulator.is_inited == 0) {
         simulator_init();
         simulator.is_inited = 1;
