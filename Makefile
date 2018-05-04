@@ -9,7 +9,8 @@ SRCDIR=src
 DEPDIR = src
 _DEPS = attiny13.h gui.h gui_pins.h gui_pins_positions.h \
         common.h decode.h registers_list.h threads.h
-_SRCS = attiny13.c gui.c gui_pins.c gui_callbacks.c main.c do_functions.c threads.c
+_SRCS = attiny13.c gui.c gui_pins.c gui_callbacks.c main.c \
+        do_functions.c threads.c common.c
 SRCS = $(patsubst %,$(SRCDIR)/%,$(_SRCS))
 DEPS = $(patsubst %,$(DEPDIR)/%,$(_DEPS))
 

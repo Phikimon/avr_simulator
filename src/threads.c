@@ -156,8 +156,9 @@ static void* chip_thread(void* chip_ptr)
 
         int e;
         if ((e = execute_cycle(chip)) != ERR_SUCCESS) {
-            shared_printf("Error in thread %d in"
-                          " execute_cycle: %d. Aborting\n", e);
+            shared_printf("\nError in thread %d in"
+                          " execute_cycle: %s. Aborting\n",
+                            number, ERRS_TEXT[e]);
             exit(1);
         }
 

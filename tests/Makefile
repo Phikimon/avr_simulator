@@ -13,9 +13,12 @@ receive: receive.c
 
 blink.bin: blink
 	avr-objcopy -I elf32-avr -O binary $< $@
+	avr-objdump -D $< > objdump_1
+	avr-objdump -D $< > objdump_2
 
 receive.bin: receive
 	avr-objcopy -I elf32-avr -O binary $< $@
+	avr-objdump -D $< > objdump_2
 
 clean:
-	rm blink receive *.s *.bin || true
+	rm objdump_* blink receive *.s *.bin || true
