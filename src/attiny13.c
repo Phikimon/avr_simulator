@@ -114,6 +114,7 @@ int decode(struct attiny13* chip, uint16_t cmd)
 {
     if ((check_interrupt(chip) == ERR_INTERRUPT))
         return ERR_SUCCESS;
+    acquire_lock();
     printf("\n%4X", cmd);
 #define INSTRUCTION(NAME, CONDITION, DURATION, FILL_ARGS)     \
 {                                                             \
@@ -126,6 +127,8 @@ int decode(struct attiny13* chip, uint16_t cmd)
         return ERR_SUCCESS;                                   \
     }                                                         \
 } // Do-while-0 is not used intentionally
+    fflush(stdout);
+    release_lock();
 
 #include "decode.h"
 

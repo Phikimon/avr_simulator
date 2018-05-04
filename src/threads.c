@@ -147,15 +147,9 @@ static void* chip_thread(void* chip_ptr)
 
         int e;
         if ((e = execute_cycle(chip)) != ERR_SUCCESS) {
-            SEM_EQUAL_TO(INTERACT_SEM,  0, WAIT);
-            SEM_PUSH    (INTERACT_SEM, +1, 0);
-            SEM_FLUSH();
-
-            printf("Error in thread %d in execute_cycle: %d. Aborting\n", e);
+            shared_printf("Error in thread %d in"
+                          " execute_cycle: %d. Aborting\n", e);
             exit(1);
-
-            SEM_PUSH    (INTERACT_SEM, -1, 0);
-            SEM_FLUSH();
         }
 
         SEM_PUSH(number, -1, 0);
@@ -220,7 +214,47 @@ void simulator_init(void)
     }
 }
 
+
+void
+__attribute__((format(printf,1,2)))
+shared_printf(const char* format, ...)
+{
+    struct sembuf sbuf[SEMBUF_SIZE] = {0};
+    int sbuf_counter = 0;
+
+    SEM_EQUAL_TO(INTERACT_SEM,  0, WAIT);
+    SEM_PUSH    (INTERACT_SEM, +1, 0);
+    SEM_FLUSH();
+
+    va_list args;
+    va_start(args,format);
+    vprintf(format, args);
+    va_end(args);
+
+    SEM_PUSH    (INTERACT_SEM, -1, 0);
+    SEM_FLUSH();
+}
+
+void acquire_lock(void)
+{
+    struct sembuf sbuf[SEMBUF_SIZE] = {0};
+    int sbuf_counter = 0;
+
+    SEM_EQUAL_TO(LOCK_SEM,  0, WAIT);
+    SEM_PUSH    (LOCK_SEM, +1, 0);
+    SEM_FLUSH();
+}
+
+void release_lock(void)
+{
+    struct sembuf sbuf[SEMBUF_SIZE] = {0};
+    int sbuf_counter = 0;
+
+    SEM_PUSH    (LOCK_SEM, -1, 0);
+    SEM_FLUSH();
+}
+
 #undef SEM_PUSH
 #undef SEM_FLUSH
-#undef NOT_LESS_THAN
-#undef EQUAL_TO
+#undef SEM_NOT_LESS_THAN
+#undef SEM_EQUAL_TO

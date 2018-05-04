@@ -14,7 +14,8 @@ enum {
     CHIPS_NUM,
 
     INTERACT_SEM = 2,
-    SEM_NUM = 3
+    LOCK_SEM = 3,
+    SEM_NUM = 4
 };
 
 enum {
@@ -39,6 +40,12 @@ void simulator_init(void);
 
 void launch_threads(void);
 
+void
+shared_printf(const char* format, ...)
+__attribute__((format(printf,1,2)));
+
+void acquire_lock(void);
+void release_lock(void);
 
 #undef SEM_PUSH
 #undef SEM_FLUSH

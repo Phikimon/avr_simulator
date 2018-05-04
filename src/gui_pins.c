@@ -51,12 +51,12 @@ void gui_refresh_pins_states(void)
         (void)strncpy(led_name, pin_name, MAX_STR_LEN);
         (void)strcat(led_name, "_LED");
         GtkWidget* led = gui_find_widget_child(layout, led_name);
+        assert(led);
 
         // Change its state accordingly
         int chip_num = i / ONE_CHIP_PINS_NUM;
-        uint8_t PINB = simulator.chips[chip_num]->PINB;
-
         int pin_num  = i % ONE_CHIP_PINS_NUM;
+        uint8_t PINB = simulator.chips[chip_num]->PINB;
 
         const char* led_picture = (PINB & _BV(pin_num)) ?
                                   "go-top" : "go-bottom";
