@@ -2,16 +2,16 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkTextBuffer" id="Memory_1">
+  <object class="GtkTextBuffer" id="Memory_1_buf">
     <property name="text" translatable="yes">1</property>
   </object>
-  <object class="GtkTextBuffer" id="Memory_2">
+  <object class="GtkTextBuffer" id="Memory_2_buf">
     <property name="text" translatable="yes">2</property>
   </object>
-  <object class="GtkTextBuffer" id="Registers_1">
+  <object class="GtkTextBuffer" id="Registers_1_buf">
     <property name="text" translatable="yes">1</property>
   </object>
-  <object class="GtkTextBuffer" id="Registers_2">
+  <object class="GtkTextBuffer" id="Registers_2_buf">
     <property name="text" translatable="yes">2</property>
   </object>
   <object class="GtkWindow" id="window_main">
@@ -625,8 +625,7 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkFileChooserButton" id="F_FILE">
-                        <property name="name">F_FILE</property>
+                      <object class="GtkFileChooserButton">
                         <property name="width_request">640</property>
                         <property name="height_request">45</property>
                         <property name="visible">True</property>
@@ -640,8 +639,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFileChooserButton" id="S_FILE">
-                        <property name="name">S_FILE</property>
+                      <object class="GtkFileChooserButton">
                         <property name="width_request">0</property>
                         <property name="height_request">45</property>
                         <property name="visible">True</property>
@@ -683,13 +681,14 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
-                  <object class="GtkTextView">
+                  <object class="GtkTextView" id="Registers_1">
+                    <property name="name">Registers_1</property>
+                    <property name="buffer">Registers_1_buf</property>
                     <property name="height_request">330</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
-                    <property name="buffer">Registers_1</property>
                     <property name="monospace">True</property>
                   </object>
                 </child>
@@ -704,13 +703,14 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTextView">
+                  <object class="GtkTextView" id="Registers_2">
+                    <property name="name">Registers_2</property>
+                    <property name="buffer">Registers_2_buf</property>
                     <property name="height_request">330</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
-                    <property name="buffer">Registers_2</property>
                     <property name="monospace">True</property>
                   </object>
                   <packing>
@@ -746,13 +746,14 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
-                  <object class="GtkTextView">
+                  <object class="GtkTextView" id="Memory_1">
+                    <property name="name">Memory_1</property>
+                    <property name="buffer">Memory_1_buf</property>
                     <property name="height_request">200</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
-                    <property name="buffer">Memory_1</property>
                     <property name="monospace">True</property>
                   </object>
                 </child>
@@ -767,13 +768,14 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTextView">
+                  <object class="GtkTextView" id="Memory_2">
+                    <property name="name">Memory_2</property>
+                    <property name="buffer">Memory_2_buf</property>
                     <property name="height_request">200</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
                     <property name="cursor_visible">False</property>
-                    <property name="buffer">Memory_2</property>
                     <property name="monospace">True</property>
                   </object>
                   <packing>

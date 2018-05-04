@@ -98,8 +98,8 @@ void simulator_step(long int step_num)
         SEM_PUSH(SECOND_CHIP, 0, 0);
         SEM_FLUSH();
 
-        //gui_dump_memory();
-        //gui_dump_registers();
+        gui_dump_memory();
+        gui_dump_registers();
 
         if (gui_refresh_pins_connections() == -1)
             return;
@@ -145,7 +145,6 @@ static void* chip_thread(void* chip_ptr)
         SEM_EQUAL_TO(number, +1, WAIT);
         SEM_FLUSH();
 
-        printf("chip_thread in da hauz\n");
         int e;
         if ((e = execute_cycle(chip)) != ERR_SUCCESS) {
             SEM_EQUAL_TO(INTERACT_SEM,  0, WAIT);

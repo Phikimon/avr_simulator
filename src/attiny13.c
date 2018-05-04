@@ -44,7 +44,7 @@ int execute_cycle(struct attiny13* chip)
 
     if (chip->cmd.progress == 0) {
         cmd = chip->flash_memory[chip->PC];
-        cmd = (cmd >> 8) | (cmd << 8);
+//        cmd = (cmd >> 8) | (cmd << 8);
         if ((decode_err = decode(chip, cmd))) {
             return decode_err;
         }
@@ -114,7 +114,7 @@ int decode(struct attiny13* chip, uint16_t cmd)
 {
     if ((check_interrupt(chip) == ERR_INTERRUPT))
         return ERR_SUCCESS;
-    printf("\n%4X\n", cmd);
+    printf("\n%4X", cmd);
 #define INSTRUCTION(NAME, CONDITION, DURATION, FILL_ARGS)     \
 {                                                             \
     if (CONDITION) {                                          \
