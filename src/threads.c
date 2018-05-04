@@ -160,8 +160,8 @@ static void* gui_thread(void* chips_ptr)
 {
     struct attiny13* chips = (struct attiny13*)chips_ptr;
 
-    for (int i = 0; i < ATTINY_PINS_NUM; i++) {
-        simulator.pins_connections[i] = PIN_NC;
+    for (int i = 0; i < DOCK_PINS_NUM; i++) {
+        simulator.pins_conn_mask[i] = (uint32_t)0x00000000;
     }
     // Please note, 'simulator.chips = chips;' won't work
     for (int i = 0; i < CHIPS_NUM; i++) {
