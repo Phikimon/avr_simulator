@@ -106,12 +106,12 @@ void simulator_step(long int step_num)
         SEM_PUSH(SECOND_CHIP, 0, 0);
         SEM_FLUSH();
 
-        gui_dump_memory();
-        gui_dump_registers();
-
         if (gui_refresh_pins_connections() == -1)
             return;
         gui_refresh_pins_states();
+
+        gui_dump_memory();
+        gui_dump_registers();
         //dump_pins_states();
     }
 }
