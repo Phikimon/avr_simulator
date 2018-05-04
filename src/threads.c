@@ -39,8 +39,8 @@ void launch_threads(int argc, char *argv[])
     if (argc != 3) {
         simulator.is_inited = 0;
     } else {
-        int ctor_ret1 = attiny13_ctor(simulator.chips[FIRST_CHIP],  argv[1]);
-        int ctor_ret2 = attiny13_ctor(simulator.chips[SECOND_CHIP], argv[2]);
+        int ctor_ret1 = attiny13_ctor(&chips[FIRST_CHIP],  argv[1]);
+        int ctor_ret2 = attiny13_ctor(&chips[SECOND_CHIP], argv[2]);
         if (!ctor_ret1 && !ctor_ret2)
             simulator.is_inited = 1;
     }

@@ -115,7 +115,7 @@ int decode(struct attiny13* chip, uint16_t cmd)
     if ((check_interrupt(chip) == ERR_INTERRUPT))
         return ERR_SUCCESS;
     acquire_lock();
-    printf("\n%4X", cmd);
+    printf("%4X", cmd);
 #define INSTRUCTION(NAME, CONDITION, DURATION, FILL_ARGS)     \
 {                                                             \
     if (CONDITION) {                                          \
