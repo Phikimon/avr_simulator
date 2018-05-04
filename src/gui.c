@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <ctype.h>
+#include <string.h>
 
 static GtkWidget* gui_create_window(void);
 
@@ -152,15 +153,41 @@ void gui_dump_registers(void)
         assert(text_buf);
 
         // Get registers content
-        const int LINE_LENGTH = sizeof("RXX = FF;   RXX = FF;\n") - sizeof((char)'\0');
-        const int TEXT_SIZE = LINE_LENGTH * REGISTERS_NUM / 2 + sizeof((char)'\0');  // 2 registers in one line
+        const int LINE_LENGTH = sizeof("RRRRRR = FF;   RRRRRR = FF;\n") - sizeof((char)'\0');
+        const int LINES_NUM = (REGISTERS_NUM + NOT_RESERVED_IO_REGS_NUM + 1) / 2 + 1;   // 2 registers in one line + 1 separation line
+        const int TEXT_SIZE = LINE_LENGTH * LINES_NUM;
         char registers_text[TEXT_SIZE];
-        for (int k = 0; k < REGISTERS_NUM / 2; k++)
-            sprintf(registers_text + k * LINE_LENGTH, "R%-2d = %02hX;   R%-2d = %02hX;\n",
+        int k;  // Lines counter
+        for (k = 0; k < REGISTERS_NUM / 2; k++)
+            sprintf(registers_text + k * LINE_LENGTH, "R%-5d = %02hX;   R%-5d = %02hX;\n",
                     k,                     (uint8_t)simulator.chips[i]->registers[k],
                     k + REGISTERS_NUM / 2, (uint8_t)simulator.chips[i]->registers[k + REGISTERS_NUM / 2]);
 
-        registers_text[TEXT_SIZE - 1] = ' ';
+        // Separation line
+        memset(registers_text + k * LINE_LENGTH, '_', LINE_LENGTH - 1);
+        k++;
+        registers_text[k * LINE_LENGTH - 1] = '\n';
+
+        // Get io_registers content
+        int len = 0;
+
+#define RESERVED_REGISTER(OFFSET)
+#define IO_REGISTER(NAME, OFFSET)                                                         \
+        if (len == 0)                                                                     \
+            len = sprintf(registers_text + k * LINE_LENGTH, "%-6s = %02hX;",              \
+                           #NAME, simulator.chips[i]->io_registers[OFFSET]);              \
+        else {                                                                            \
+            sprintf(registers_text + k * LINE_LENGTH + len, "   %-6s = %02hX;\n",         \
+                                #NAME, simulator.chips[i]->io_registers[OFFSET]);         \
+            k++;                                                                          \
+            len = 0;                                                                      \
+        }
+#include "registers_list.h"
+#undef RESERVED_REGISTER
+#undef IO_REGISTER
+
+        for(int j = k * LINE_LENGTH + len; j < TEXT_SIZE; j++)
+            registers_text[j] = ' ';
 
         // Set text
         (void)gtk_text_buffer_set_text(text_buf, registers_text, TEXT_SIZE - 1);
