@@ -1,8 +1,16 @@
 #include "attiny13.h"
+#include "threads.h"
+#include "gui.h"
+
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <assert.h>
 
-int attiny13_ctor(struct attiny13* chip)
+int attiny13_ctor(struct attiny13* chip, const char* filename)
 {
     chip->data_memory  = chip->registers;
     chip->io_registers = (uint8_t*)&(chip->data_memory[IO_REGISTERS_OFFSET]);
@@ -11,6 +19,19 @@ int attiny13_ctor(struct attiny13* chip)
     chip->PC = 0x0000;
     chip->SPL = DATA_MEMORY_SIZE - 1;    // 0x9F
     chip->cmd.progress = 0;
+    //Copy file in memory
+    assert(filename);
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        printf_gui(simulator.window, "Unable to open file. Try again");
+        return -1;
+    }
+    (void)read(fd, chip->flash_memory, FLASH_MEMORY_SIZE);
+    if (close(fd) == -1) {
+        printf_gui(simulator.window, "Error closing file descriptor");
+        return -1;
+    }
+
     return 0;
 }
 
@@ -23,10 +44,10 @@ int execute_cycle(struct attiny13* chip)
 
     if (chip->cmd.progress == 0) {
         cmd = chip->flash_memory[chip->PC];
-    //    cmd = (cmd >> 8) | (cmd << 8); // Change endian                       /// !!!!!!!!!!!!!!111
-        decode_err = decode(chip, cmd);
-        if (decode_err)
+        cmd = (cmd >> 8) | (cmd << 8);
+        if ((decode_err = decode(chip, cmd))) {
             return decode_err;
+        }
     }
 
     return chip->cmd.func(chip);
@@ -93,7 +114,7 @@ int decode(struct attiny13* chip, uint16_t cmd)
 {
     if ((check_interrupt(chip) == ERR_INTERRUPT))
         return ERR_SUCCESS;
-    printf("\n%4X", cmd);
+    printf("\n%4X\n", cmd);
 #define INSTRUCTION(NAME, CONDITION, DURATION, FILL_ARGS)     \
 {                                                             \
     if (CONDITION) {                                          \

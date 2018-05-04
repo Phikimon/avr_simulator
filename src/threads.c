@@ -4,6 +4,7 @@
 #include "gui.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 // Declarations
 static void semop_push(struct sembuf* sbuf,
@@ -36,7 +37,7 @@ void launch_threads(void)
     pthread_t        gui, chip_pthreads[CHIPS_NUM];
     struct attiny13  chips[CHIPS_NUM] = {0};
 
-    semid = semget(IPC_PRIVATE, CHIPS_NUM, IPC_CREAT|0666);
+    semid = semget(IPC_PRIVATE, SEM_NUM, IPC_CREAT|0666);
     if (semid == -1) {
         perror("semget");
         exit(1);
@@ -85,9 +86,10 @@ void simulator_step(long int step_num)
     struct sembuf sbuf[SEMBUF_SIZE] = {0};
     int sbuf_counter = 0;
 
-    gui_refresh_pins_connections();
+    if (gui_refresh_pins_connections() == -1)
+        return;
+    gui_refresh_pins_states();
     for (int i = 0; i < step_num; i++) {
-
         SEM_PUSH(FIRST_CHIP,  +1, 0);
         SEM_PUSH(SECOND_CHIP, +1, 0);
         SEM_FLUSH();
@@ -99,7 +101,8 @@ void simulator_step(long int step_num)
         //gui_dump_memory();
         //gui_dump_registers();
 
-        //refresh_pins_connections();
+        if (gui_refresh_pins_connections() == -1)
+            return;
         gui_refresh_pins_states();
         //dump_pins_states();
     }
@@ -120,11 +123,14 @@ static void semop_push(struct sembuf* sbuf,
 static void semop_flush(struct sembuf* sbuf,
                         int*           sbuf_counter)
 {
-    int semop_ret = semop(semid, sbuf, *sbuf_counter);
-    if (semop_ret == -1) {
-        perror("semop");
-        exit(1);
-    }
+    do {
+        int semop_ret = semop(semid, sbuf, *sbuf_counter);
+        if ((semop_ret == -1) && (errno != EAGAIN)) {
+            perror("semop");
+            if (errno != EINTR)
+                exit(1);
+        }
+    } while (errno == EINTR);
     *sbuf_counter = 0;
 }
 
@@ -139,10 +145,18 @@ static void* chip_thread(void* chip_ptr)
         SEM_EQUAL_TO(number, +1, WAIT);
         SEM_FLUSH();
 
+        printf("chip_thread in da hauz\n");
         int e;
         if ((e = execute_cycle(chip)) != ERR_SUCCESS) {
-            printf_gui(simulator.window,
-                       "Error in execute_cycle: %d", e);
+            SEM_EQUAL_TO(INTERACT_SEM,  0, WAIT);
+            SEM_PUSH    (INTERACT_SEM, +1, 0);
+            SEM_FLUSH();
+
+            printf("Error in thread %d in execute_cycle: %d. Aborting\n", e);
+            exit(1);
+
+            SEM_PUSH    (INTERACT_SEM, -1, 0);
+            SEM_FLUSH();
         }
 
         SEM_PUSH(number, -1, 0);
@@ -157,6 +171,7 @@ static void* gui_thread(void* chips_ptr)
 {
     struct attiny13* chips = (struct attiny13*)chips_ptr;
 
+    simulator.is_inited = 0;
     for (int i = 0; i < DOCK_PINS_NUM; i++) {
         simulator.pins_conn_mask[i] = (uint32_t)0x00000000;
     }
@@ -174,6 +189,37 @@ static void* gui_thread(void* chips_ptr)
     pthread_exit(0);
 }
 
+void simulator_init(void)
+{
+    printf_gui(simulator.window, "Please choose .bin files to execute");
+
+    for (int i = 0; i < CHIPS_NUM; i++) {
+
+        GtkWidget *dialog;
+        dialog = gtk_file_chooser_dialog_new ("Open File",
+                                              simulator.window,
+                                              GTK_FILE_CHOOSER_ACTION_OPEN,
+                                              "Cancel",
+                                              GTK_RESPONSE_CANCEL,
+                                              "Open",
+                                              GTK_RESPONSE_ACCEPT,
+                                              NULL);
+
+        int ctor_ret = -1;
+        while (ctor_ret) {
+            gint res = gtk_dialog_run (GTK_DIALOG (dialog));
+            if (res == GTK_RESPONSE_ACCEPT)
+            {
+                GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
+                char* filename = gtk_file_chooser_get_filename (chooser);
+                ctor_ret = attiny13_ctor(simulator.chips[i], filename);
+                g_free (filename);
+            }
+        }
+
+        gtk_widget_destroy (dialog);
+    }
+}
 
 #undef SEM_PUSH
 #undef SEM_FLUSH

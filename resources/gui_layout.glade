@@ -625,7 +625,8 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkFileChooserButton">
+                      <object class="GtkFileChooserButton" id="F_FILE">
+                        <property name="name">F_FILE</property>
                         <property name="width_request">640</property>
                         <property name="height_request">45</property>
                         <property name="visible">True</property>
@@ -639,7 +640,8 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFileChooserButton">
+                      <object class="GtkFileChooserButton" id="S_FILE">
+                        <property name="name">S_FILE</property>
                         <property name="width_request">0</property>
                         <property name="height_request">45</property>
                         <property name="visible">True</property>
