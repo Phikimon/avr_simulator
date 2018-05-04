@@ -91,57 +91,42 @@ DO_FUNC(SBI,
     chip->PC++;
 })
 
+#define DO_LOGIC_INSTRUCTION                                        \
+do {                                                                \
+    SET_FLAG(SREG_Z, __Rd == 0);                                    \
+    SET_FLAG(SREG_N, __Rd < 0);                                     \
+    SET_FLAG(SREG_S, __Rd < 0);   /* S = N ^ V, V = 0 => S = N */   \
+    chip->SREG &= ~_BV(SREG_V);   /* V = 0 */                       \
+    chip->PC++;                                                     \
+} while (0)
 
 DO_FUNC(AND,
 {
     __Rd &= __Rr;
-
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, __Rd < 0);
-    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
-    chip->SREG &= ~_BV(SREG_V);    // V = 0
-
-    chip->PC++;
+    DO_LOGIC_INSTRUCTION;
 })
 
 DO_FUNC(ANDI,
 {
     __Rd &= __K;
-
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, __Rd < 0);
-    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
-    chip->SREG &= ~_BV(SREG_V);    // V = 0
-
-    chip->PC++;
+    DO_LOGIC_INSTRUCTION;
 })
 
 
 DO_FUNC(OR,
 {
     __Rd |= __Rr;
-
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, __Rd < 0);
-    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
-    chip->SREG &= ~_BV(SREG_V);    // V = 0
-
-    chip->PC++;
+    DO_LOGIC_INSTRUCTION;
 })
 
 
 DO_FUNC(ORI,
 {
     __Rd |= __K;
-
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, __Rd < 0);
-    SET_FLAG(SREG_S, __Rd < 0);    // S = N ^ V, V = 0 => S = N
-    chip->SREG &= ~_BV(SREG_V);    // V = 0
-
-    chip->PC++;
+    DO_LOGIC_INSTRUCTION;
 })
 
+#undef DO_LOGIC_INSTRUCTION
 
 DO_FUNC(NEG,
 {
@@ -373,14 +358,14 @@ DO_FUNC(RJMP,
 
 
 #define DO_CONDITIONAL_BRANCH(CONDITION)                            \
-    do {                                                            \
-        if (chip->cmd.progress == 1 && !(CONDITION)) {              \
-            chip->cmd.duration = 1;    /* No branch */              \
-            chip->PC++;                                             \
-        }                                                           \
-        else if (chip->cmd.progress == 2)                           \
-            chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;    \
-    } while (0)
+do {                                                            \
+    if (chip->cmd.progress == 1 && !(CONDITION)) {              \
+        chip->cmd.duration = 1;    /* No branch */              \
+        chip->PC++;                                             \
+    }                                                           \
+    else if (chip->cmd.progress == 2)                           \
+        chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;    \
+} while (0)
 
 
 DO_FUNC(BREQ,
