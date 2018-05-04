@@ -306,7 +306,7 @@ DO_FUNC(RCALL,
         return ERR_STACK_OVERFLOW;
     *(uint16_t*)(chip->data_memory + chip->SPL - 1) = chip->PC + 1;
     chip->SPL -= 2;
-    chip->PC += (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;
+    chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;
 })
 
 DO_FUNC(RJMP,
@@ -314,7 +314,7 @@ DO_FUNC(RJMP,
     if(chip->cmd.progress == 1)
         return ERR_SUCCESS;
 
-    chip->PC += (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;
+    chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;
 })
 
 
