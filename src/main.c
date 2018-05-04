@@ -1,5 +1,7 @@
 #include "threads.h"
 
+#define NDEBUG
+
 #ifndef NDEBUG
 int main(void)
 {
