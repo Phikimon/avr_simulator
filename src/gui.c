@@ -12,6 +12,14 @@ GtkWidget* gui_configure(int argc, char *argv[])
 {
     gtk_init(&argc, &argv);
 
+    GtkCssProvider* css = gtk_css_provider_new();
+    (void)gtk_css_provider_load_from_data(css,
+                          "GtkTextView, textview {"
+                                   "font-family: 'Oxygen Mono Regular', monospace;"
+                          "}", -1, NULL);
+    gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
+                                              GTK_STYLE_PROVIDER(css), 1);
+
     GtkWidget* window = gui_create_window();
     gtk_widget_show (window);
 
