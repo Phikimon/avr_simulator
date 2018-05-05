@@ -38,12 +38,12 @@ static int is_reserved(int8_t offset) {
     }
 }
 
-#define __Rd chip->registers[chip->cmd.args.arg[1]]    //   Destination (and source) register in the Register File
-#define __Rr chip->registers[chip->cmd.args.arg[0]]    //   Source register in the Register File
-#define __K  chip->cmd.args.arg[0]                     //   Constant data
-#define __k  chip->cmd.args.addr                       //   Constant address
-#define __A  chip->cmd.args.arg[0]                     //   I/O location address
-#define __b  chip->cmd.args.arg[1]                     //   Bit in the Register File or I/O Register (3-bit)
+#define __Rd chip->registers[chip->cmd.args.arg[1]]    // Destination (and source) register in the Register File
+#define __Rr chip->registers[chip->cmd.args.arg[0]]    // Source register in the Register File
+#define __K  chip->cmd.args.arg[0]                     // Constant data
+#define __k  chip->cmd.args.addr                       // Constant address
+#define __A  chip->cmd.args.arg[0]                     // I/O location address
+#define __b  chip->cmd.args.arg[1]                     // Bit in the Register File or I/O Register (3-bit)
 
 #define SET_FLAG(FLAG, CONDITION)    \
 do {                                 \
@@ -274,11 +274,21 @@ DO_FUNC(LDI,
     __Rd = __K;
     chip->PC++;
 })
+
+
 DO_FUNC(MOV,
 {
     __Rd = __Rr;
     chip->PC++;
 })
+
+
+DO_FUNC(MOVW,
+{
+    *((int16_t*)&__Rd) = *((int16_t*)&__Rr);
+    chip->PC++;
+})
+
 
 DO_FUNC(CLR,
 {
@@ -377,7 +387,7 @@ DO_FUNC(RJMP,
 })
 
 
-#define DO_CONDITIONAL_BRANCH(CONDITION)                            \
+#define DO_CONDITIONAL_BRANCH(CONDITION)                        \
 do {                                                            \
     if (chip->cmd.progress == 1 && !(CONDITION)) {              \
         chip->cmd.duration = 1;    /* No branch */              \
@@ -520,14 +530,68 @@ DO_FUNC(LD_X,
     chip->PC++;
 })
 
+DO_FUNC(LD_X_INC,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    __Rd = chip->data_memory[X_ADDR % DATA_MEMORY_SIZE];
+    chip->registers[26]++;
+    chip->PC++;
+})
+
+DO_FUNC(LD_X_DEC,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    chip->registers[26]--;
+    __Rd = chip->data_memory[X_ADDR % DATA_MEMORY_SIZE];
+    chip->PC++;
+})
+
 DO_FUNC(LD_Y,
 {
     __Rd = chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE];
     chip->PC++;
 })
 
+DO_FUNC(LD_Y_INC,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    __Rd = chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE];
+    chip->registers[28]++;
+    chip->PC++;
+})
+
+DO_FUNC(LD_Y_DEC,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    chip->registers[28]--;
+    __Rd = chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE];
+    chip->PC++;
+})
+
 DO_FUNC(LD_Z,
 {
+    __Rd = chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE];
+    chip->PC++;
+})
+
+DO_FUNC(LD_Z_INC,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    __Rd = chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE];
+    chip->registers[30]++;
+    chip->PC++;
+})
+
+DO_FUNC(LD_Z_DEC,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    chip->registers[30]--;
     __Rd = chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE];
     chip->PC++;
 })
