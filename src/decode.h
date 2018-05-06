@@ -19,6 +19,13 @@ do {                                                             \
     chip->cmd.args.arg[1] = (cmd >> 4) & 0x1F;                   \
 } while (0)
 
+// xxxx xxxx KKdd KKKK
+#define FILL_ARGS_ADIW_SBIW                                                                     \
+do {                                                                                            \
+    chip->cmd.args.arg[0] = (cmd & 0x0F) | ((cmd >> 4) & 0x03);                                 \
+    chip->cmd.args.arg[1] = 24 + 2 * ((cmd >> 4) & 0x03);    /* d(2 bit) = 24, 26, 28, 30 */    \
+} while (0)
+
 // xxxx xxxd dddd xxxx
 #define FILL_ARGS_Rd_ONLY                                        \
 do {                                                             \
@@ -98,8 +105,13 @@ do {                                                             \
     INSTRUCTION ( SBR      , ((cmd & 0xF000) == 0x6000) ,     1    , FILL_ARGS_Rd_K       )
     INSTRUCTION ( CBR      , ((cmd & 0xF000) == 0x7000) ,     1    , FILL_ARGS_Rd_K       )
     INSTRUCTION ( ADD      , ((cmd & 0xFC00) == 0x0C00) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( ADC      , ((cmd & 0xFC00) == 0x1C00) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( ADIW     , ((cmd & 0xFF00) == 0x9600) ,     1    , FILL_ARGS_ADIW_SBIW  )
     INSTRUCTION ( SUB      , ((cmd & 0xFC00) == 0x1800) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( SUBI     , ((cmd & 0xF000) == 0x5000) ,     1    , FILL_ARGS_Rd_K       )
+    INSTRUCTION ( SBC      , ((cmd & 0xFC00) == 0x0800) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( SBCI     , ((cmd & 0xF000) == 0x4000) ,     1    , FILL_ARGS_Rd_K       )
+    INSTRUCTION ( SBIW     , ((cmd & 0xFF00) == 0x9700) ,     1    , FILL_ARGS_ADIW_SBIW  )
     INSTRUCTION ( DEC      , ((cmd & 0xFC00) == 0x940A) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( INC      , ((cmd & 0xFC00) == 0x9403) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( CP       , ((cmd & 0xFC00) == 0x1400) ,     1    , FILL_ARGS_ALU        )
