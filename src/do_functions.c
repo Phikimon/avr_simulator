@@ -615,6 +615,24 @@ DO_FUNC(ST_X,
     chip->PC++;
 })
 
+DO_FUNC(ST_X_INC,
+{
+    if(chip->cmd.progress == 1)
+        return ERR_SUCCESS;
+    chip->data_memory[X_ADDR % DATA_MEMORY_SIZE] = __Rd;
+    chip->registers[26]++;
+    chip->PC++;
+})
+
+DO_FUNC(ST_X_DEC,
+{
+    if(chip->cmd.progress == 1)
+        return ERR_SUCCESS;
+    chip->registers[26]--;
+    chip->data_memory[X_ADDR % DATA_MEMORY_SIZE] = __Rd;
+    chip->PC++;
+})
+
 DO_FUNC(ST_Y,
 {
     if(chip->cmd.progress == 1)
@@ -623,10 +641,46 @@ DO_FUNC(ST_Y,
     chip->PC++;
 })
 
+DO_FUNC(ST_Y_INC,
+{
+    if(chip->cmd.progress == 1)
+        return ERR_SUCCESS;
+    chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE] = __Rd;
+    chip->registers[28]++;
+    chip->PC++;
+})
+
+DO_FUNC(ST_Y_DEC,
+{
+    if(chip->cmd.progress == 1)
+        return ERR_SUCCESS;
+    chip->registers[28]--;
+    chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE] = __Rd;
+    chip->PC++;
+})
+
 DO_FUNC(ST_Z,
 {
     if(chip->cmd.progress == 1)
         return ERR_SUCCESS;
+    chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE] = __Rd;
+    chip->PC++;
+})
+
+DO_FUNC(ST_Z_INC,
+{
+    if(chip->cmd.progress == 1)
+        return ERR_SUCCESS;
+    chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE] = __Rd;
+    chip->registers[30]++;
+    chip->PC++;
+})
+
+DO_FUNC(ST_Z_DEC,
+{
+    if(chip->cmd.progress == 1)
+        return ERR_SUCCESS;
+    chip->registers[30]--;
     chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE] = __Rd;
     chip->PC++;
 })
