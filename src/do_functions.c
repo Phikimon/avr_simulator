@@ -362,13 +362,6 @@ DO_FUNC(CPI,
     chip->PC++;
 })
 
-DO_FUNC(LDI,
-{
-    __Rd = __K;
-    chip->PC++;
-})
-
-
 DO_FUNC(MOV,
 {
     __Rd = __Rr;
@@ -676,155 +669,146 @@ DO_FUNC(CLI,
     chip->PC++;
 })
 
+DO_FUNC(LDI,
+{
+    __Rd = __K;
+    chip->PC++;
+})
+
+#define MODE_UNCHANGED  0
+#define MODE_INC        1
+#define MODE_DEC        2
+
+#define DO_LD(ADDR, MODE, REG_NUM)                           \
+do {                                                         \
+    if(chip->cmd.progress < chip->cmd.duration)              \
+        return ERR_SUCCESS;                                  \
+                                                             \
+    if(MODE == MODE_DEC)                                     \
+        chip->registers[REG_NUM]--;                          \
+    if((REGISTERS_NUM <= ADDR) &&       /* reserved */       \
+       (ADDR < REGISTERS_NUM + IO_REGISTERS_NUM) &&          \
+       is_reserved(ADDR - REGISTERS_NUM))                    \
+        __Rd = 0x00;                                         \
+    else                                                     \
+        __Rd = chip->data_memory[ADDR % DATA_MEMORY_SIZE];   \
+    if(MODE == MODE_INC)                                     \
+        chip->registers[REG_NUM]++;                          \
+    chip->PC++;                                              \
+} while (0)
+
+
 DO_FUNC(LD_X,
 {
-    __Rd = chip->data_memory[X_ADDR % DATA_MEMORY_SIZE];
-    chip->PC++;
+    DO_LD(X_ADDR, MODE_UNCHANGED, 0);
 })
 
 DO_FUNC(LD_X_INC,
 {
-    if(chip->cmd.progress < chip->cmd.duration)
-        return ERR_SUCCESS;
-    __Rd = chip->data_memory[X_ADDR % DATA_MEMORY_SIZE];
-    chip->registers[26]++;
-    chip->PC++;
+    DO_LD(X_ADDR, MODE_INC, 26);
 })
 
 DO_FUNC(LD_X_DEC,
 {
-    if(chip->cmd.progress < chip->cmd.duration)
-        return ERR_SUCCESS;
-    chip->registers[26]--;
-    __Rd = chip->data_memory[X_ADDR % DATA_MEMORY_SIZE];
-    chip->PC++;
+    DO_LD(X_ADDR, MODE_DEC, 26);
 })
 
 DO_FUNC(LD_Y,
 {
-    __Rd = chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE];
-    chip->PC++;
+    DO_LD(Y_ADDR, MODE_UNCHANGED, 0);
 })
 
 DO_FUNC(LD_Y_INC,
 {
-    if(chip->cmd.progress < chip->cmd.duration)
-        return ERR_SUCCESS;
-    __Rd = chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE];
-    chip->registers[28]++;
-    chip->PC++;
+    DO_LD(Y_ADDR, MODE_INC, 28);
 })
 
 DO_FUNC(LD_Y_DEC,
 {
-    if(chip->cmd.progress < chip->cmd.duration)
-        return ERR_SUCCESS;
-    chip->registers[28]--;
-    __Rd = chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE];
-    chip->PC++;
+    DO_LD(Y_ADDR, MODE_DEC, 28);
 })
 
 DO_FUNC(LD_Z,
 {
-    __Rd = chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE];
-    chip->PC++;
+    DO_LD(Z_ADDR, MODE_UNCHANGED, 0);
 })
 
 DO_FUNC(LD_Z_INC,
 {
-    if(chip->cmd.progress < chip->cmd.duration)
-        return ERR_SUCCESS;
-    __Rd = chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE];
-    chip->registers[30]++;
-    chip->PC++;
+    DO_LD(Z_ADDR, MODE_INC, 30);
 })
 
 DO_FUNC(LD_Z_DEC,
 {
-    if(chip->cmd.progress < chip->cmd.duration)
-        return ERR_SUCCESS;
-    chip->registers[30]--;
-    __Rd = chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE];
-    chip->PC++;
+    DO_LD(Z_ADDR, MODE_DEC, 30);
 })
+
+#undef DO_LD
+
+#define DO_ST(ADDR, MODE, REG_NUM)                          \
+do {                                                        \
+    if(chip->cmd.progress < chip->cmd.duration)             \
+        return ERR_SUCCESS;                                 \
+    if(MODE == MODE_DEC)                                    \
+        chip->registers[REG_NUM]--;                         \
+    if(!((REGISTERS_NUM <= ADDR) &&     /* not reserved */  \
+       (ADDR < REGISTERS_NUM + IO_REGISTERS_NUM) &&         \
+       is_reserved(ADDR - REGISTERS_NUM)))                  \
+        chip->data_memory[ADDR % DATA_MEMORY_SIZE] = __Rd;  \
+    if(MODE == MODE_INC)                                    \
+        chip->registers[REG_NUM]++;                         \
+    chip->PC++;                                             \
+} while (0)
 
 DO_FUNC(ST_X,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->data_memory[X_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->PC++;
+    DO_ST(X_ADDR, MODE_UNCHANGED, 0);
 })
 
 DO_FUNC(ST_X_INC,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->data_memory[X_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->registers[26]++;
-    chip->PC++;
+    DO_ST(X_ADDR, MODE_INC, 26);
 })
 
 DO_FUNC(ST_X_DEC,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->registers[26]--;
-    chip->data_memory[X_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->PC++;
+    DO_ST(X_ADDR, MODE_DEC, 26);
 })
 
 DO_FUNC(ST_Y,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->PC++;
+    DO_ST(Y_ADDR, MODE_UNCHANGED, 0);
 })
 
 DO_FUNC(ST_Y_INC,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->registers[28]++;
-    chip->PC++;
+    DO_ST(Y_ADDR, MODE_INC, 28);
 })
 
 DO_FUNC(ST_Y_DEC,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->registers[28]--;
-    chip->data_memory[Y_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->PC++;
+    DO_ST(Y_ADDR, MODE_DEC, 28);
 })
 
 DO_FUNC(ST_Z,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->PC++;
+    DO_ST(Z_ADDR, MODE_UNCHANGED, 0);
 })
 
 DO_FUNC(ST_Z_INC,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->registers[30]++;
-    chip->PC++;
+    DO_ST(Z_ADDR, MODE_INC, 30);
 })
 
 DO_FUNC(ST_Z_DEC,
 {
-    if(chip->cmd.progress == 1)
-        return ERR_SUCCESS;
-    chip->registers[30]--;
-    chip->data_memory[Z_ADDR % DATA_MEMORY_SIZE] = __Rd;
-    chip->PC++;
+    DO_ST(Z_ADDR, MODE_DEC, 30);
 })
+
+#undef DO_ST
+#undef MODE_UNCHANGED
+#undef MODE_INC
+#undef MODE_DEC
 
 DO_FUNC(LPM,
 {
