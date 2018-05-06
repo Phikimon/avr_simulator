@@ -28,7 +28,14 @@ do {                                                             \
 // xxxx xxkk kkkk kxxx
 #define FILL_ARGS_BRANCH                                         \
 do {                                                             \
-    chip->cmd.args.addr = (cmd >> 3) & 0x7F;                     \
+    chip->cmd.args.arg[0] = (cmd >> 3) & 0x7F;                   \
+} while (0)
+
+// xxxx xxkk kkkk ksss
+#define FILL_ARGS_BRBC_BRBS                                      \
+do {                                                             \
+    chip->cmd.args.arg[0] = (cmd >> 3) & 0x7F;                   \
+    chip->cmd.args.arg[1] = cmd & 0x07;                          \
 } while (0)
 
 // xxxx kkkk kkkk kkkk
@@ -122,6 +129,8 @@ do {                                                             \
     INSTRUCTION ( RCALL    , ((cmd & 0xF000) == 0xD000) ,     3    , FILL_ARGS_RJMP_RCALL )
     INSTRUCTION ( RJMP     , ((cmd & 0xF000) == 0xC000) ,     2    , FILL_ARGS_RJMP_RCALL )
 
+    INSTRUCTION ( BRBC     , ((cmd & 0xFC00) == 0xF400) ,     2    , FILL_ARGS_BRBC_BRBS  )
+    INSTRUCTION ( BRBS     , ((cmd & 0xFC00) == 0xF000) ,     2    , FILL_ARGS_BRBC_BRBS  )
     INSTRUCTION ( BREQ     , ((cmd & 0xFC07) == 0xF001) ,     2    , FILL_ARGS_BRANCH     )
     INSTRUCTION ( BRNE     , ((cmd & 0xFC07) == 0xF401) ,     2    , FILL_ARGS_BRANCH     )
     INSTRUCTION ( BRGE     , ((cmd & 0xFC07) == 0xF404) ,     2    , FILL_ARGS_BRANCH     )
@@ -151,6 +160,7 @@ do {                                                             \
 #undef FILL_ARGS_ALU
 #undef FILL_ARGS_Rd_ONLY
 #undef FILL_ARGS_BRANCH
+#undef FILL_ARGS_BRBC_BRBS
 #undef FILL_ARGS_RJMP_RCALL
 #undef FILL_ARGS_Rd_K
 #undef FILL_ARGS_LONG_Rd

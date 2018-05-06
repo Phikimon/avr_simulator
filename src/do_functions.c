@@ -41,9 +41,10 @@ static int is_reserved(int8_t offset) {
 #define __Rd chip->registers[chip->cmd.args.arg[1]]    // Destination (and source) register in the Register File
 #define __Rr chip->registers[chip->cmd.args.arg[0]]    // Source register in the Register File
 #define __K  chip->cmd.args.arg[0]                     // Constant data
-#define __k  chip->cmd.args.addr                       // Constant address
+#define __k  chip->cmd.args.arg[0]                     // Constant address
 #define __A  chip->cmd.args.arg[0]                     // I/O location address
 #define __b  chip->cmd.args.arg[1]                     // Bit in the Register File or I/O Register (3-bit)
+#define __s  chip->cmd.args.arg[1]                     // Bit in the Status Register (3-bit)
 
 #define SET_FLAG(FLAG, CONDITION)    \
 do {                                 \
@@ -398,6 +399,16 @@ do {                                                            \
 } while (0)
 
 
+DO_FUNC(BRBC,
+{
+    DO_CONDITIONAL_BRANCH((chip->SREG & _BV(__s)) == 0);
+})
+
+DO_FUNC(BRBS,
+{
+    DO_CONDITIONAL_BRANCH(chip->SREG & _BV(__s));
+})
+
 DO_FUNC(BREQ,
 {
     DO_CONDITIONAL_BRANCH(GET_FLAG_Z);
@@ -632,10 +643,12 @@ DO_FUNC(LPM,
 
 
 #undef DO_FUNC
+#undef DO_CONDITIONAL_BRANCH
+#undef SET_FLAG
 #undef __Rd
 #undef __Rr
 #undef __K
 #undef __k
 #undef __A
 #undef __b
-#undef SET_FLAG
+#undef __s
