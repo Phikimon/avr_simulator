@@ -318,22 +318,34 @@ DO_FUNC(INC,
     chip->PC++;
 })
 
+#define DO_CP_CPC(COMPARISON)                                   \
+do {                                                            \
+    int Rd7 = (__Rd >> 7);                                      \
+    int Rr7 = (__Rr >> 7);                                      \
+    int R7 = ((COMPARISON) >> 7);                               \
+                                                                \
+    SET_FLAG(SREG_C, (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7));  \
+    SET_FLAG(SREG_Z, __Rd == __Rr);                             \
+    SET_FLAG(SREG_N, R7);                                       \
+    SET_FLAG(SREG_V, (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7));   \
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);                  \
+                                                                \
+    chip->PC++;                                                 \
+} while (0)
+
+
 
 DO_FUNC(CP,
 {
-    int Rd7 = (__Rd >> 7);
-    int Rr7 = (__Rr >> 7);
-    int R7 = ((__Rd - __Rr) >> 7);
-
-    SET_FLAG(SREG_C, (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7));
-    SET_FLAG(SREG_Z, __Rd == __Rr);
-    SET_FLAG(SREG_N, R7);
-    SET_FLAG(SREG_V, (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7));
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
+    DO_CP_CPC(__Rd - __Rr);
 })
 
+DO_FUNC(CPC,
+{
+    DO_CP_CPC(__Rd - __Rr - GET_FLAG_C);
+})
+
+#undef DO_CP_CPC
 
 DO_FUNC(CPI,
 {
@@ -349,7 +361,6 @@ DO_FUNC(CPI,
 
     chip->PC++;
 })
-
 
 DO_FUNC(LDI,
 {
@@ -468,16 +479,43 @@ DO_FUNC(RJMP,
     chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;
 })
 
+#define DO_SCIP(CONDITION)                                              \
+do {                                                                    \
+    if((chip->cmd.progress < chip->cmd.duration) && !(CONDITION)) {     \
+        chip->cmd.duration = 1;     /* No scip */                       \
+        chip->PC += 1;                                                  \
+    }                                                                   \
+    else                                                                \
+        chip->PC += 2;                                                  \
+} while (0)
+
+
 DO_FUNC(CPSE,
 {
-    if((chip->cmd.progress < chip->cmd.duration) && (__Rd != __Rr)) {
-        chip->cmd.duration = 1;     // No scip
-        chip->PC += 1;
-    }
-    else
-        chip->PC += 2;
+    DO_SCIP(__Rd == __Rr);
 })
 
+DO_FUNC(SBRC,
+{
+    DO_SCIP((__Rr & _BV(__b)) == 0);
+})
+
+DO_FUNC(SBRS,
+{
+    DO_SCIP(__Rr & _BV(__b));
+})
+
+DO_FUNC(SBIC,
+{
+    DO_SCIP(is_reserved(__A) || ((is_reserved(__A) == 0) && (chip->io_registers[__A] & _BV(__b)) == 0));
+})
+
+DO_FUNC(SBIS,
+{
+    DO_SCIP((is_reserved(__A) == 0) && (chip->io_registers[__A] & _BV(__b)));
+})
+
+#undef DO_SCIP
 
 #define DO_CONDITIONAL_BRANCH(CONDITION)                        \
 do {                                                            \

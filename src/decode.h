@@ -6,9 +6,16 @@ do {                                                             \
 } while (0)
 
 // xxxx xxxx AAAA Abbb
-#define FILL_ARGS_CBI_SBI                                        \
+#define FILL_ARGS_A_b                                            \
 do {                                                             \
     chip->cmd.args.arg[0] = (cmd >> 3) | 0x1F;                   \
+    chip->cmd.args.arg[1] = cmd & 0x07;                          \
+} while (0)
+
+// xxxx xxxr rrrr xbbb
+#define FILL_ARGS_SBRC_SBRS                                      \
+do {                                                             \
+    chip->cmd.args.arg[0] = (cmd >> 4) & 0x1F;                   \
     chip->cmd.args.arg[1] = cmd & 0x07;                          \
 } while (0)
 
@@ -93,8 +100,8 @@ do {                                                             \
 
     INSTRUCTION ( BSET     , ((cmd & 0xFF8F) == 0x9408) ,     1    , FILL_ARGS_BSET_BCLR  )
     INSTRUCTION ( BCLR     , ((cmd & 0xFF8F) == 0x9488) ,     1    , FILL_ARGS_BSET_BCLR  )
-    INSTRUCTION ( CBI      , ((cmd & 0xFF00) == 0x9800) ,     2    , FILL_ARGS_CBI_SBI    )
-    INSTRUCTION ( SBI      , ((cmd & 0xFF00) == 0x9A00) ,     2    , FILL_ARGS_CBI_SBI    )
+    INSTRUCTION ( CBI      , ((cmd & 0xFF00) == 0x9800) ,     2    , FILL_ARGS_A_b        )
+    INSTRUCTION ( SBI      , ((cmd & 0xFF00) == 0x9A00) ,     2    , FILL_ARGS_A_b        )
 
     INSTRUCTION ( AND      , ((cmd & 0xFC00) == 0x2000) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( ANDI     , ((cmd & 0xF000) == 0x7000) ,     1    , FILL_ARGS_Rd_K       )
@@ -115,8 +122,6 @@ do {                                                             \
     INSTRUCTION ( SBIW     , ((cmd & 0xFF00) == 0x9700) ,     1    , FILL_ARGS_ADIW_SBIW  )
     INSTRUCTION ( DEC      , ((cmd & 0xFE0F) == 0x940A) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( INC      , ((cmd & 0xFE0F) == 0x9403) ,     1    , FILL_ARGS_Rd_ONLY    )
-    INSTRUCTION ( CP       , ((cmd & 0xFC00) == 0x1400) ,     1    , FILL_ARGS_ALU        )
-    INSTRUCTION ( CPI      , ((cmd & 0xF000) == 0x3000) ,     1    , FILL_ARGS_Rd_K       )
     INSTRUCTION ( MOV      , ((cmd & 0xFC00) == 0x2C00) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( MOVW     , ((cmd & 0xFF00) == 0x0100) ,     1    , FILL_ARGS_MOVW       )
     INSTRUCTION ( CLR      , ((cmd & 0xFC00) == 0x2400) ,     1    , FILL_ARGS_LONG_Rd    )
@@ -124,6 +129,11 @@ do {                                                             \
     INSTRUCTION ( TST      , ((cmd & 0xFC00) == 0x2000) ,     1    , FILL_ARGS_LONG_Rd    )
     INSTRUCTION ( LSR      , ((cmd & 0xFE0F) == 0x9406) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( LSL      , ((cmd & 0xFC00) == 0x0C00) ,     1    , FILL_ARGS_LONG_Rd    )
+
+    INSTRUCTION ( CP       , ((cmd & 0xFC00) == 0x1400) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( CPC      , ((cmd & 0xFC00) == 0x0400) ,     1    , FILL_ARGS_ALU        )
+    INSTRUCTION ( CPI      , ((cmd & 0xF000) == 0x3000) ,     1    , FILL_ARGS_Rd_K       )
+    INSTRUCTION ( CPSE     , ((cmd & 0xFC00) == 0x1000) ,     2    , FILL_ARGS_ALU        )
 
     INSTRUCTION ( PUSH     , ((cmd & 0xFE0F) == 0x920F) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( POP      , ((cmd & 0xFE0F) == 0x900F) ,     2    , FILL_ARGS_Rd_ONLY    )
@@ -154,7 +164,10 @@ do {                                                             \
     INSTRUCTION ( RCALL    , ((cmd & 0xF000) == 0xD000) ,     3    , FILL_ARGS_RJMP_RCALL )
     INSTRUCTION ( RJMP     , ((cmd & 0xF000) == 0xC000) ,     2    , FILL_ARGS_RJMP_RCALL )
 
-    INSTRUCTION ( CPSE     , ((cmd & 0xFC00) == 0x1000) ,     2    , FILL_ARGS_ALU        )
+    INSTRUCTION ( SBRC     , ((cmd & 0xFE08) == 0xFC00) ,     2    , FILL_ARGS_SBRC_SBRS  )
+    INSTRUCTION ( SBRS     , ((cmd & 0xFE08) == 0xFE00) ,     2    , FILL_ARGS_SBRC_SBRS  )
+    INSTRUCTION ( SBIC     , ((cmd & 0xFF00) == 0x9900) ,     2    , FILL_ARGS_A_b        )
+    INSTRUCTION ( SBIS     , ((cmd & 0xFF00) == 0x9B00) ,     2    , FILL_ARGS_A_b        )
 
     INSTRUCTION ( BRBC     , ((cmd & 0xFC00) == 0xF400) ,     2    , FILL_ARGS_BRBC_BRBS  )
     INSTRUCTION ( BRBS     , ((cmd & 0xFC00) == 0xF000) ,     2    , FILL_ARGS_BRBC_BRBS  )
