@@ -70,7 +70,11 @@ do {                                                             \
     chip->cmd.args.arg[1] = ((cmd >> 4) & 0x0F) * 2;             \
 } while (0)
 
-
+// xxxx xxxx xsss xxxx
+#define FILL_ARGS_BSET_BCLR                                      \
+do {                                                             \
+    chip->cmd.args.arg[1] = (cmd >> 4) & 0x07;                   \
+} while (0)
 
 // xxxx xxxx xxxx xxxx
 #define FILL_ARGS_NO_ARGS
@@ -80,6 +84,8 @@ do {                                                             \
     INSTRUCTION ( IN       , ((cmd & 0xF800) == 0xB000) ,     1    , FILL_ARGS_IN_OUT     )
     INSTRUCTION ( OUT      , ((cmd & 0xF800) == 0xB800) ,     1    , FILL_ARGS_IN_OUT     )
 
+    INSTRUCTION ( BSET     , ((cmd & 0xFF8F) == 0x9408) ,     1    , FILL_ARGS_BSET_BCLR  )
+    INSTRUCTION ( BCLR     , ((cmd & 0xFF8F) == 0x9488) ,     1    , FILL_ARGS_BSET_BCLR  )
     INSTRUCTION ( CBI      , ((cmd & 0xFF00) == 0x9800) ,     2    , FILL_ARGS_CBI_SBI    )
     INSTRUCTION ( SBI      , ((cmd & 0xFF00) == 0x9A00) ,     2    , FILL_ARGS_CBI_SBI    )
 
@@ -152,8 +158,24 @@ do {                                                             \
     INSTRUCTION ( RET      , ((cmd & 0xFFFF) == 0x9508) ,     4    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( RETI     , ((cmd & 0xFFFF) == 0x9518) ,     4    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( IJMP     , ((cmd & 0xFFFF) == 0x9409) ,     2    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( SEC      , ((cmd & 0xFFFF) == 0x9408) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( CLC      , ((cmd & 0xFFFF) == 0x9488) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( SEN      , ((cmd & 0xFFFF) == 0x9428) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( CLN      , ((cmd & 0xFFFF) == 0x94A8) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( SEZ      , ((cmd & 0xFFFF) == 0x9418) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( CLZ      , ((cmd & 0xFFFF) == 0x9498) ,     1    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( SEI      , ((cmd & 0xFFFF) == 0x9478) ,     1    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( CLI      , ((cmd & 0xFFFF) == 0x94F8) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( SES      , ((cmd & 0xFFFF) == 0x9448) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( CLS      , ((cmd & 0xFFFF) == 0x94C8) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( SEV      , ((cmd & 0xFFFF) == 0x9438) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( CLV      , ((cmd & 0xFFFF) == 0x94B8) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( SET      , ((cmd & 0xFFFF) == 0x9468) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( CLT      , ((cmd & 0xFFFF) == 0x94E8) ,     1    , FILL_ARGS_NO_ARGS    )
+
+
+
+
 
 #undef FILL_ARGS_IN_OUT
 #undef FILL_ARGS_CBI_SBI

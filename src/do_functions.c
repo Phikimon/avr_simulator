@@ -639,8 +639,89 @@ DO_FUNC(LPM,
     chip->PC++;
 })
 
+DO_FUNC(BSET,
+{
+    chip->SREG |= _BV(__s);
+    chip->PC++;
+})
 
+DO_FUNC(BCLR,
+{
+    chip->SREG &= ~_BV(__s);
+    chip->PC++;
+})
 
+DO_FUNC(SEC,
+{
+    chip->SREG |= _BV(SREG_C);
+    chip->PC++;
+})
+
+DO_FUNC(CLC,
+{
+    chip->SREG &= ~_BV(SREG_C);
+    chip->PC++;
+})
+
+DO_FUNC(SEN,
+{
+    chip->SREG |= _BV(SREG_N);
+    chip->PC++;
+})
+
+DO_FUNC(CLN,
+{
+    chip->SREG &= ~_BV(SREG_N);
+    chip->PC++;
+})
+
+DO_FUNC(SEZ,
+{
+    chip->SREG |= _BV(SREG_Z);
+    chip->PC++;
+})
+
+DO_FUNC(CLZ,
+{
+    chip->SREG &= ~_BV(SREG_Z);
+    chip->PC++;
+})
+
+DO_FUNC(SES,
+{
+    chip->SREG |= _BV(SREG_S);
+    chip->PC++;
+})
+
+DO_FUNC(CLS,
+{
+    chip->SREG &= ~_BV(SREG_S);
+    chip->PC++;
+})
+
+DO_FUNC(SEV,
+{
+    chip->SREG |= _BV(SREG_V);
+    chip->PC++;
+})
+
+DO_FUNC(CLV,
+{
+    chip->SREG &= ~_BV(SREG_V);
+    chip->PC++;
+})
+
+DO_FUNC(SET,
+{
+    chip->SREG |= _BV(SREG_T);
+    chip->PC++;
+})
+
+DO_FUNC(CLT,
+{
+    chip->SREG &= ~_BV(SREG_T);
+    chip->PC++;
+})
 
 #undef DO_FUNC
 #undef DO_CONDITIONAL_BRANCH
