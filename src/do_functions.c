@@ -161,6 +161,19 @@ DO_FUNC(NEG,
     chip->PC++;
 })
 
+DO_FUNC(COM,
+{
+    __Rd = 0xFF - __Rd;
+
+    chip->SREG |= _BV(SREG_C);
+    SET_FLAG(SREG_Z, __Rd == 0);
+    SET_FLAG(SREG_N, __Rd < 0);
+    chip->SREG &= ~_BV(SREG_N);
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+
+    chip->PC++;
+})
+
 #define DO_ADD_ADC(CODE)                                        \
 do {                                                            \
     int Rd7 = (__Rd >> 7);                                      \
@@ -455,6 +468,16 @@ DO_FUNC(RJMP,
     chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;
 })
 
+DO_FUNC(CPSE,
+{
+    if((chip->cmd.progress < chip->cmd.duration) && (__Rd != __Rr)) {
+        chip->cmd.duration = 1;     // No scip
+        chip->PC += 1;
+    }
+    else
+        chip->PC += 2;
+})
+
 
 #define DO_CONDITIONAL_BRANCH(CONDITION)                        \
 do {                                                            \
@@ -462,7 +485,7 @@ do {                                                            \
         chip->cmd.duration = 1;    /* No branch */              \
         chip->PC++;                                             \
     }                                                           \
-    else if (chip->cmd.progress == 2)                           \
+    else                                                        \
         chip->PC = (chip->PC + __k + 1) % FLASH_MEMORY_SIZE;    \
 } while (0)
 
@@ -589,6 +612,18 @@ DO_FUNC(IJMP,
     if(chip->cmd.progress == 1)
         return ERR_SUCCESS;
     chip->PC = Z_ADDR;
+})
+
+DO_FUNC(ICALL,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+
+    if(chip->SPL < (REGISTERS_NUM + IO_REGISTERS_NUM + 1))
+        return ERR_STACK_OVERFLOW;
+    *(uint16_t*)(chip->data_memory + chip->SPL - 1) = chip->PC + 1;
+    chip->SPL -= 2;
+    chip->PC = Z_ADDR % FLASH_MEMORY_SIZE;
 })
 
 DO_FUNC(SEI,
