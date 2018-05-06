@@ -161,37 +161,34 @@ DO_FUNC(NEG,
     chip->PC++;
 })
 
+#define DO_ADD_ADC(CODE)                                        \
+do {                                                            \
+    int Rd7 = (__Rd >> 7);                                      \
+    int Rr7 = (__Rr >> 7);                                      \
+    CODE;                                                       \
+    int R7 = (__Rd >> 7);                                       \
+                                                                \
+    SET_FLAG(SREG_C, (Rd7 & Rr7) | (Rr7 & ~R7) | (~R7 & Rd7));  \
+    SET_FLAG(SREG_Z, __Rd == 0);                                \
+    SET_FLAG(SREG_N, R7);                                       \
+    SET_FLAG(SREG_V, (Rd7 & Rr7 & ~R7) | (~Rd7 & ~Rr7 & R7));   \
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);                  \
+                                                                \
+    chip->PC++;                                                 \
+} while (0)
+
+
 DO_FUNC(ADD,
 {
-    int Rd7 = (__Rd >> 7);
-    int Rr7 = (__Rr >> 7);
-    __Rd += __Rr;
-    int R7 = (__Rd >> 7);
-
-    SET_FLAG(SREG_C, (Rd7 & Rr7) | (Rr7 & ~R7) | (~R7 & Rd7));
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, R7);
-    SET_FLAG(SREG_V, (Rd7 & Rr7 & ~R7) | (~Rd7 & ~Rr7 & R7));
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
+    DO_ADD_ADC(__Rd += __Rr);
 })
 
 DO_FUNC(ADC,
 {
-    int Rd7 = (__Rd >> 7);
-    int Rr7 = (__Rr >> 7);
-    __Rd += __Rr + GET_FLAG_C;
-    int R7 = (__Rd >> 7);
-
-    SET_FLAG(SREG_C, (Rd7 & Rr7) | (Rr7 & ~R7) | (~R7 & Rd7));
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, R7);
-    SET_FLAG(SREG_V, (Rd7 & Rr7 & ~R7) | (~Rd7 & ~Rr7 & R7));
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
+    DO_ADD_ADC(__Rd += __Rr + GET_FLAG_C);
 })
+
+#undef DO_ADD_ADC
 
 DO_FUNC(ADIW,
 {
@@ -210,69 +207,62 @@ DO_FUNC(ADIW,
     chip->PC++;
 })
 
+#define DO_SUB_SBC(CODE)                                        \
+do {                                                            \
+    int Rd7 = (__Rd >> 7);                                      \
+    int Rr7 = (__Rr >> 7);                                      \
+    CODE;                                                       \
+    int R7 = (__Rd >> 7);                                       \
+                                                                \
+    SET_FLAG(SREG_C, (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7));  \
+    SET_FLAG(SREG_Z, __Rd == 0);                                \
+    SET_FLAG(SREG_N, R7);                                       \
+    SET_FLAG(SREG_V, (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7));   \
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);                  \
+                                                                \
+    chip->PC++;                                                 \
+} while (0)
+
 DO_FUNC(SUB,
 {
-    int Rd7 = (__Rd >> 7);
-    int Rr7 = (__Rr >> 7);
-    __Rd -= __Rr;
-    int R7 = (__Rd >> 7);
-
-    SET_FLAG(SREG_C, (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7));
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, R7);
-    SET_FLAG(SREG_V, (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7));
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
-})
-
-DO_FUNC(SUBI,
-{
-    int Rd7 = __Rd >> 7;
-    int K7  = __K  >> 7;
-    __Rd -= __K;
-    int R7 = __Rd >> 7;
-
-    SET_FLAG(SREG_C, (~Rd7 & K7) | (K7 & R7) | (R7 & ~Rd7));
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, R7);
-    SET_FLAG(SREG_V, (Rd7 & ~K7 & ~R7) | (~Rd7 & K7 & R7));
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
+    DO_SUB_SBC(__Rd -= __Rr);
 })
 
 DO_FUNC(SBC,
 {
-    int Rd7 = (__Rd >> 7);
-    int Rr7 = (__Rr >> 7);
-    __Rd -= __Rr + GET_FLAG_C;
-    int R7 = (__Rd >> 7);
+    DO_SUB_SBC(__Rd -= __Rr + GET_FLAG_C);
+})
 
-    SET_FLAG(SREG_C, (~Rd7 & Rr7) | (Rr7 & R7) | (R7 & ~Rd7));
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, R7);
-    SET_FLAG(SREG_V, (Rd7 & ~Rr7 & ~R7) | (~Rd7 & Rr7 & R7));
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
+#undef DO_SUB_SBC
 
-    chip->PC++;
+#define DO_SUBI_SBCI(CODE)                                      \
+do {                                                            \
+    int Rd7 = __Rd >> 7;                                        \
+    int K7  = __K  >> 7;                                        \
+    CODE;                                                       \
+    int R7 = __Rd >> 7;                                         \
+                                                                \
+    SET_FLAG(SREG_C, (~Rd7 & K7) | (K7 & R7) | (R7 & ~Rd7));    \
+    SET_FLAG(SREG_Z, __Rd == 0);                                \
+    SET_FLAG(SREG_N, R7);                                       \
+    SET_FLAG(SREG_V, (Rd7 & ~K7 & ~R7) | (~Rd7 & K7 & R7));     \
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);                  \
+                                                                \
+    chip->PC++;                                                 \
+} while (0)
+
+
+DO_FUNC(SUBI,
+{
+    DO_SUBI_SBCI(__Rd -= __K);
 })
 
 DO_FUNC(SBCI,
 {
-    int Rd7 = __Rd >> 7;
-    int K7  = __K  >> 7;
-    __Rd -= __K + GET_FLAG_C;
-    int R7 = __Rd >> 7;
-
-    SET_FLAG(SREG_C, (~Rd7 & K7) | (K7 & R7) | (R7 & ~Rd7));
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, R7);
-    SET_FLAG(SREG_V, (Rd7 & ~K7 & ~R7) | (~Rd7 & K7 & R7));
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
+    DO_SUBI_SBCI(__Rd -= __K + GET_FLAG_C);
 })
+
+#undef DO_SUBI_SBCI
 
 DO_FUNC(SBIW,
 {
