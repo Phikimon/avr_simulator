@@ -129,6 +129,8 @@ do {                                                             \
     INSTRUCTION ( TST      , ((cmd & 0xFC00) == 0x2000) ,     1    , FILL_ARGS_LONG_Rd    )
     INSTRUCTION ( LSR      , ((cmd & 0xFE0F) == 0x9406) ,     1    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( LSL      , ((cmd & 0xFC00) == 0x0C00) ,     1    , FILL_ARGS_LONG_Rd    )
+    INSTRUCTION ( ROL      , ((cmd & 0xFC00) == 0x1C00) ,     1    , FILL_ARGS_LONG_Rd    )
+    INSTRUCTION ( ROR      , ((cmd & 0xFE0F) == 0x9407) ,     1    , FILL_ARGS_Rd_ONLY    )
 
     INSTRUCTION ( CP       , ((cmd & 0xFC00) == 0x1400) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( CPC      , ((cmd & 0xFC00) == 0x0400) ,     1    , FILL_ARGS_ALU        )

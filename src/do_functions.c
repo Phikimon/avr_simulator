@@ -401,36 +401,43 @@ DO_FUNC(TST,
     chip->PC++;
 })
 
+#define DO_SHIFT(C_FLAG, RD, N_FLAG)            \
+do {                                            \
+    int old_C = GET_FLAG_C;                     \
+    SET_FLAG(SREG_C, C_FLAG);                   \
+                                                \
+    __Rd = RD;                                  \
+                                                \
+    SET_FLAG(SREG_N, N_FLAG);                   \
+    SET_FLAG(SREG_Z, __Rd == 0);                \
+    SET_FLAG(SREG_V, GET_FLAG_N ^ GET_FLAG_C);  \
+    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);  \
+                                                \
+    chip->PC++;                                 \
+} while (0)
+
 
 DO_FUNC(LSR,
 {
-    SET_FLAG(SREG_C, __Rd & 0x01);
-
-    __Rd >>= 1;
-
-    SET_FLAG(SREG_Z, __Rd == 0);
-    chip->SREG &= ~_BV(SREG_N);
-    SET_FLAG(SREG_V, GET_FLAG_N ^ GET_FLAG_C);
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
+    DO_SHIFT(__Rd & 0x01, __Rd >> 1, 0);
 })
-
 
 DO_FUNC(LSL,
 {
-    SET_FLAG(SREG_C, (__Rd >> 7) & 0x01);
-
-    __Rd <<= 1;
-
-    SET_FLAG(SREG_Z, __Rd == 0);
-    SET_FLAG(SREG_N, __Rd < 0);
-    SET_FLAG(SREG_V, GET_FLAG_N ^ GET_FLAG_C);
-    SET_FLAG(SREG_S, GET_FLAG_N ^ GET_FLAG_V);
-
-    chip->PC++;
+    DO_SHIFT(__Rd >> 7, __Rd << 1, __Rd < 0);
 })
 
+DO_FUNC(ROL,
+{
+    DO_SHIFT(__Rd >> 7, (__Rd << 1) | old_C, __Rd < 0);
+})
+
+DO_FUNC(ROR,
+{
+    DO_SHIFT(__Rd & 0x01, (__Rd >> 1) | (old_C << 7), __Rd < 0);
+})
+
+#undef DO_SHIFT
 
 DO_FUNC(PUSH,
 {
