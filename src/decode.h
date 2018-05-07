@@ -65,6 +65,13 @@ do {                                                             \
     chip->cmd.args.arg[1] = ((cmd >> 4) & 0x0F) + 16;            \
 } while (0)
 
+// xxqx qqxd dddd xqqq
+#define FILL_ARGS_Rd_q                                                                   \
+do {                                                                                     \
+    chip->cmd.args.arg[0] = (cmd & 0x07) | ((cmd >> 10) & 0x03) | ((cmd >> 13) & 0x01);  \
+    chip->cmd.args.arg[1] = (cmd >> 4) & 0x1F;                                           \
+} while (0)
+
 // xxxx xxdd dddd dddd
 #define FILL_ARGS_LONG_Rd                                        \
 do {                                                             \
@@ -160,6 +167,8 @@ do {                                                             \
     INSTRUCTION ( LD_Z     , ((cmd & 0xFE0F) == 0x8000) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( LD_Z_INC , ((cmd & 0xFE0F) == 0x9001) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( LD_Z_DEC , ((cmd & 0xFE0F) == 0x9002) ,     2    , FILL_ARGS_Rd_ONLY    )
+    INSTRUCTION ( LDD_Y    , ((cmd & 0xD208) == 0x8008) ,     2    , FILL_ARGS_Rd_q       )
+    INSTRUCTION ( LDD_Z    , ((cmd & 0xD208) == 0x8000) ,     2    , FILL_ARGS_Rd_q       )
     INSTRUCTION ( LDI      , ((cmd & 0xF000) == 0xE000) ,     1    , FILL_ARGS_Rd_K       )
 
     INSTRUCTION ( ST_X     , ((cmd & 0xFE0F) == 0x920C) ,     2    , FILL_ARGS_Rd_ONLY    )
@@ -171,6 +180,8 @@ do {                                                             \
     INSTRUCTION ( ST_Z     , ((cmd & 0xFE0F) == 0x8200) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( ST_Z_INC , ((cmd & 0xFE0F) == 0x9201) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( ST_Z_DEC , ((cmd & 0xFE0F) == 0x9202) ,     2    , FILL_ARGS_Rd_ONLY    )
+    INSTRUCTION ( STD_Y    , ((cmd & 0xD208) == 0x8208) ,     2    , FILL_ARGS_Rd_q       )
+    INSTRUCTION ( STD_Z    , ((cmd & 0xD208) == 0x8200) ,     2    , FILL_ARGS_Rd_q       )
 
     INSTRUCTION ( LPM      , ((cmd & 0xFE0F) == 0x9004) ,     3    , FILL_ARGS_Rd_ONLY    )
 

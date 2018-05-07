@@ -47,6 +47,7 @@ static int is_reserved(int8_t offset) {
 #define __A  chip->cmd.args.arg[0]   // I/O location address
 #define __b  chip->cmd.args.arg[1]   // Bit in the Register File or I/O Register (3-bit)
 #define __s  chip->cmd.args.arg[1]   // Bit in the Status Register (3-bit)
+#define __q  chip->cmd.args.arg[0]   // Displacement for direct addressing (6-bit)
 
 #define SET_FLAG(FLAG, CONDITION)    \
 do {                                 \
@@ -770,6 +771,15 @@ DO_FUNC(LD_Z_DEC,
     DO_LD(Z_ADDR, MODE_DEC, 30);
 })
 
+DO_FUNC(LDD_Y,
+{
+    DO_LD(Y_ADDR + __q, MODE_UNCHANGED, 0);
+})
+
+DO_FUNC(LDD_Z,
+{
+    DO_LD(Z_ADDR + __q, MODE_UNCHANGED, 0);
+})
 #undef DO_LD
 
 #define DO_ST(ADDR, MODE, REG_NUM)                          \
@@ -830,6 +840,16 @@ DO_FUNC(ST_Z_INC,
 DO_FUNC(ST_Z_DEC,
 {
     DO_ST(Z_ADDR, MODE_DEC, 30);
+})
+
+DO_FUNC(STD_Y,
+{
+    DO_ST(Y_ADDR + __q, MODE_UNCHANGED, 0);
+})
+
+DO_FUNC(STD_Z,
+{
+    DO_ST(Z_ADDR + __q, MODE_UNCHANGED, 0);
 })
 
 #undef DO_ST
