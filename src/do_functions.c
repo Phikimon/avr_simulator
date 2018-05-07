@@ -34,7 +34,7 @@ static int is_reserved(int8_t offset) {
 #undef IO_REGISTER
 #undef RESERVED_REGISTER
         default:
-            assert(!"Wrong xyuo-mayo");
+            return 0;
     }
 }
 
@@ -782,6 +782,16 @@ DO_FUNC(LDD_Z,
 })
 #undef DO_LD
 
+DO_FUNC(LDS,
+{
+    uint8_t addr = (__k & 0x0F) | ((__k >> 5) & 0x03) | ((__k << 2) & 0x40) | ((!((__k >> 4) & 0x01)) << 7); // k bits:~4 4 6 5 3 2 1 0
+    if((addr < REGISTERS_NUM + IO_REGISTERS_NUM) && is_reserved(addr - REGISTERS_NUM))  // reserved
+        __Rd = 0x00;
+    else
+        __Rd = chip->data_memory[addr % DATA_MEMORY_SIZE];
+    chip->PC++;
+})
+
 #define DO_ST(ADDR, MODE, REG_NUM)                          \
 do {                                                        \
     if(chip->cmd.progress < chip->cmd.duration)             \
@@ -857,11 +867,38 @@ DO_FUNC(STD_Z,
 #undef MODE_INC
 #undef MODE_DEC
 
+DO_FUNC(STS,
+{
+    uint8_t addr = (__k & 0x0F) | ((__k >> 5) & 0x03) | ((__k << 2) & 0x40) | ((!((__k >> 4) & 0x01)) << 7); // k bits:~4 4 6 5 3 2 1 0
+    if(!((addr < REGISTERS_NUM + IO_REGISTERS_NUM) && is_reserved(addr - REGISTERS_NUM)))   // not reserved
+        chip->data_memory[addr % DATA_MEMORY_SIZE] = __Rd;
+    chip->PC++;
+})
+
+DO_FUNC(LPM_R0,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    chip->registers[0] = ((uint8_t*)chip->flash_memory)[Z_ADDR % FLASH_MEMORY_SIZE];
+    chip->PC++;
+})
+
 DO_FUNC(LPM,
 {
-    if(chip->cmd.progress < 3)
+    if(chip->cmd.progress < chip->cmd.duration)
         return ERR_SUCCESS;
     __Rd = ((uint8_t*)chip->flash_memory)[Z_ADDR % FLASH_MEMORY_SIZE];
+    chip->PC++;
+})
+
+DO_FUNC(LPM_INC,
+{
+    if(chip->cmd.progress < chip->cmd.duration)
+        return ERR_SUCCESS;
+    __Rd = ((uint8_t*)chip->flash_memory)[Z_ADDR % FLASH_MEMORY_SIZE];
+    uint16_t inc_addr = Z_ADDR + 1;
+    chip->registers[31] = inc_addr >> 8;
+    chip->registers[30] = inc_addr & 0x0F;
     chip->PC++;
 })
 

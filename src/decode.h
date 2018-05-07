@@ -104,6 +104,13 @@ do {                                                             \
     chip->cmd.args.arg[1] = cmd & 0x07;                          \
 } while (0)
 
+// xxxx xkkk dddd kkkk
+#define FILL_ARGS_LDS_STS                                        \
+do {                                                             \
+    chip->cmd.args.arg[0] = (cmd & 0x0F) | ((cmd >> 8) & 0x07);  \
+    chip->cmd.args.arg[1] = ((cmd >> 4) & 0x0F) + 16;            \
+} while (0)
+
 // xxxx xxxx xxxx xxxx
 #define FILL_ARGS_NO_ARGS
 
@@ -170,6 +177,7 @@ do {                                                             \
     INSTRUCTION ( LDD_Y    , ((cmd & 0xD208) == 0x8008) ,     2    , FILL_ARGS_Rd_q       )
     INSTRUCTION ( LDD_Z    , ((cmd & 0xD208) == 0x8000) ,     2    , FILL_ARGS_Rd_q       )
     INSTRUCTION ( LDI      , ((cmd & 0xF000) == 0xE000) ,     1    , FILL_ARGS_Rd_K       )
+    INSTRUCTION ( LDS      , ((cmd & 0xF800) == 0xA000) ,     1    , FILL_ARGS_LDS_STS    )
 
     INSTRUCTION ( ST_X     , ((cmd & 0xFE0F) == 0x920C) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( ST_X_INC , ((cmd & 0xFE0F) == 0x920D) ,     2    , FILL_ARGS_Rd_ONLY    )
@@ -182,8 +190,11 @@ do {                                                             \
     INSTRUCTION ( ST_Z_DEC , ((cmd & 0xFE0F) == 0x9202) ,     2    , FILL_ARGS_Rd_ONLY    )
     INSTRUCTION ( STD_Y    , ((cmd & 0xD208) == 0x8208) ,     2    , FILL_ARGS_Rd_q       )
     INSTRUCTION ( STD_Z    , ((cmd & 0xD208) == 0x8200) ,     2    , FILL_ARGS_Rd_q       )
+    INSTRUCTION ( STS      , ((cmd & 0xF800) == 0xA800) ,     1    , FILL_ARGS_LDS_STS    )
 
+    INSTRUCTION ( LPM_R0   , ((cmd & 0xFFFF) == 0x95C8) ,     3    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( LPM      , ((cmd & 0xFE0F) == 0x9004) ,     3    , FILL_ARGS_Rd_ONLY    )
+    INSTRUCTION ( LPM_INC  , ((cmd & 0xFE0F) == 0x9005) ,     3    , FILL_ARGS_Rd_ONLY    )
 
     INSTRUCTION ( RCALL    , ((cmd & 0xF000) == 0xD000) ,     3    , FILL_ARGS_RJMP_RCALL )
     INSTRUCTION ( RJMP     , ((cmd & 0xF000) == 0xC000) ,     2    , FILL_ARGS_RJMP_RCALL )
