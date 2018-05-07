@@ -90,6 +90,13 @@ do {                                                             \
     chip->cmd.args.arg[1] = (cmd >> 4) & 0x07;                   \
 } while (0)
 
+// xxxx xxxd dddd xbbb
+#define FILL_ARGS_BST_BLD                                        \
+do {                                                             \
+    chip->cmd.args.arg[0] = (cmd >> 4) & 0x1F;                   \
+    chip->cmd.args.arg[1] = cmd & 0x07;                          \
+} while (0)
+
 // xxxx xxxx xxxx xxxx
 #define FILL_ARGS_NO_ARGS
 
@@ -100,6 +107,8 @@ do {                                                             \
 
     INSTRUCTION ( BSET     , ((cmd & 0xFF8F) == 0x9408) ,     1    , FILL_ARGS_BSET_BCLR  )
     INSTRUCTION ( BCLR     , ((cmd & 0xFF8F) == 0x9488) ,     1    , FILL_ARGS_BSET_BCLR  )
+    INSTRUCTION ( BST      , ((cmd & 0xFE08) == 0xFA00) ,     1    , FILL_ARGS_BST_BLD    )
+    INSTRUCTION ( BLD      , ((cmd & 0xFE08) == 0xF800) ,     1    , FILL_ARGS_BST_BLD    )
     INSTRUCTION ( CBI      , ((cmd & 0xFF00) == 0x9800) ,     2    , FILL_ARGS_A_b        )
     INSTRUCTION ( SBI      , ((cmd & 0xFF00) == 0x9A00) ,     2    , FILL_ARGS_A_b        )
 
@@ -131,6 +140,8 @@ do {                                                             \
     INSTRUCTION ( LSL      , ((cmd & 0xFC00) == 0x0C00) ,     1    , FILL_ARGS_LONG_Rd    )
     INSTRUCTION ( ROL      , ((cmd & 0xFC00) == 0x1C00) ,     1    , FILL_ARGS_LONG_Rd    )
     INSTRUCTION ( ROR      , ((cmd & 0xFE0F) == 0x9407) ,     1    , FILL_ARGS_Rd_ONLY    )
+    INSTRUCTION ( ASR      , ((cmd & 0xFE0F) == 0x9405) ,     1    , FILL_ARGS_Rd_ONLY    )
+    INSTRUCTION ( SWAP     , ((cmd & 0xFE0F) == 0x9402) ,     1    , FILL_ARGS_Rd_ONLY    )
 
     INSTRUCTION ( CP       , ((cmd & 0xFC00) == 0x1400) ,     1    , FILL_ARGS_ALU        )
     INSTRUCTION ( CPC      , ((cmd & 0xFC00) == 0x0400) ,     1    , FILL_ARGS_ALU        )
