@@ -18,7 +18,7 @@ GtkWidget* gui_configure(int argc, char *argv[])
     (void)gtk_css_provider_load_from_data(css,
                           "GtkTextView, textview {"
                                    "font-family: 'MonoSpace', monospace;"
-                                   "font-size: 10;"
+                                   "font-size: 12;"
                           "}", -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                               GTK_STYLE_PROVIDER(css), 1);
@@ -113,15 +113,17 @@ void gui_dump_memory(void)
            "M e m o r y _ X"
          */
         text_view_name[7] = '0' + i + 1;
-        GtkTextView* text_view = (GtkTextView*)gui_find_widget_child(GTK_WIDGET(simulator.window),
-                                                                     text_view_name);
+        GtkTextView* text_view = (GtkTextView*)gui_find_widget_child(
+                                               GTK_WIDGET(simulator.window),
+                                               text_view_name);
         assert(text_view);
         GtkTextBuffer* text_buf = gtk_text_view_get_buffer(text_view);
         assert(text_buf);
         // Get memory content
 
         const int LINE_LENGTH = sizeof("FFFFFFFFFFFFFFFF\n") - sizeof((char)'\0');
-        const int TEXT_SIZE = LINE_LENGTH * 17 + sizeof((char)'\0'); // 8 for each representation + 1 for separation line
+        // 8 for each representation + 1 for separation line:
+        const int TEXT_SIZE = LINE_LENGTH * 17 + sizeof((char)'\0');
         char sram_text[TEXT_SIZE];
         int k = 0;  // sram_text index
         int cur_sram_byte = 0;
@@ -157,22 +159,30 @@ void gui_dump_registers(void)
         // Get text buffer
         char text_view_name[MAX_STR_LEN] = "Registers_X";
         text_view_name[10] = '0' + i + 1;
-        GtkTextView* text_view = (GtkTextView*)gui_find_widget_child(GTK_WIDGET(simulator.window),
-                                                                     text_view_name);
+        GtkTextView* text_view = (GtkTextView*)gui_find_widget_child(
+                                                GTK_WIDGET(simulator.window),
+                                                text_view_name);
         assert(text_view);
+        GtkScrolledWindow* sw = (GtkScrolledWindow*)gtk_widget_get_parent(
+                                                    GTK_WIDGET(text_view));
         GtkTextBuffer* text_buf = gtk_text_view_get_buffer(text_view);
         assert(text_buf);
 
         // Get registers content
-        const int LINE_LENGTH = sizeof("RRRRRR = FF;   RRRRRR = FF;\n") - sizeof((char)'\0');
-        const int LINES_NUM = (REGISTERS_NUM + NOT_RESERVED_IO_REGS_NUM + 1) / 2 + 1;   // 2 registers in one line + 1 separation line
+        const int LINE_LENGTH = sizeof("RRRRRR = FF;   RRRRRR = FF;\n") -
+                                sizeof((char)'\0');
+         // 2 registers in one line + 1 separation line:
+        const int LINES_NUM = (REGISTERS_NUM + NOT_RESERVED_IO_REGS_NUM + 1) / 2 + 1;
         const int TEXT_SIZE = LINE_LENGTH * LINES_NUM;
         char registers_text[TEXT_SIZE];
         int k;  // Lines counter
         for (k = 0; k < REGISTERS_NUM / 2; k++)
-            sprintf(registers_text + k * LINE_LENGTH, "R%-5d = %02hX;   R%-5d = %02hX;\n",
-                    k,                     (uint8_t)simulator.chips[i]->registers[k],
-                    k + REGISTERS_NUM / 2, (uint8_t)simulator.chips[i]->registers[k + REGISTERS_NUM / 2]);
+            sprintf(registers_text + k * LINE_LENGTH,
+                    "R%-5d = %02hX;   R%-5d = %02hX;\n",
+                    k,
+                    (uint8_t)simulator.chips[i]->registers[k],
+                    k + REGISTERS_NUM / 2,
+                    (uint8_t)simulator.chips[i]->registers[k + REGISTERS_NUM / 2]);
 
         // Separation line
         memset(registers_text + k * LINE_LENGTH, '_', LINE_LENGTH - 1);
@@ -183,55 +193,105 @@ void gui_dump_registers(void)
         int len = 0;
 
 #define RESERVED_REGISTER(OFFSET)
-#define IO_REGISTER(NAME, OFFSET)                                                         \
-        if (len == 0)                                                                     \
-            len = sprintf(registers_text + k * LINE_LENGTH, "%-6s = %02hX;",              \
-                           #NAME, simulator.chips[i]->io_registers[OFFSET]);              \
-        else {                                                                            \
-            sprintf(registers_text + k * LINE_LENGTH + len, "   %-6s = %02hX;\n",         \
-                                #NAME, simulator.chips[i]->io_registers[OFFSET]);         \
-            k++;                                                                          \
-            len = 0;                                                                      \
+#define IO_REGISTER(NAME, OFFSET)                                      \
+        if (len == 0)                                                  \
+            len = sprintf(registers_text + k * LINE_LENGTH,            \
+                    "%-6s = %02hX;",                                   \
+                    #NAME, simulator.chips[i]->io_registers[OFFSET]);  \
+        else {                                                         \
+            sprintf(registers_text + k * LINE_LENGTH + len,            \
+                    "   %-6s = %02hX;\n",                              \
+                    #NAME, simulator.chips[i]->io_registers[OFFSET]);  \
+            k++;                                                       \
+            len = 0;                                                   \
         }
 #include "registers_list.h"
 #undef RESERVED_REGISTER
 #undef IO_REGISTER
 
         sprintf(registers_text + k * LINE_LENGTH + len, "   %-6s = %02hX;",
-                            "PC", simulator.chips[i]->PC);
+                            "PC", simulator.chips[i]->PC * 2);
         k++;
 
         // Set text
+        GtkAdjustment* adj = gtk_scrolled_window_get_vadjustment(sw);
+        gdouble value = gtk_adjustment_get_value(adj);
         (void)gtk_text_buffer_set_text(text_buf, registers_text, TEXT_SIZE - 1);
+        gdouble ceiling = gtk_adjustment_get_upper(adj) -
+                          gtk_adjustment_get_page_size(adj);
+        gint new_value = (value >= ceiling) ? ceiling - 1: value;
+        (void)gtk_adjustment_set_value(adj, new_value);
     }
 }
 
-void gui_obj_dump(void)
+void gui_obj_dump_update_line(void)
 {
-    for (int i = 0; i < CHIPS_NUM; i++) {
-        // Get text buffer
-        char text_view_name[MAX_STR_LEN] = "Disasm_X";
-        text_view_name[7] = '0' + i + 1;
-        GtkTextView* text_view = (GtkTextView*)gui_find_widget_child(GTK_WIDGET(simulator.window),
-                                                                     text_view_name);
-        assert(text_view);
-        GtkTextBuffer* text_buf = gtk_text_view_get_buffer(text_view);
-        assert(text_buf);
+    static GtkTextBuffer* text_bufs[CHIPS_NUM] = { NULL, NULL };
 
-        // Get text
-        char obj_dump_file_name[MAX_STR_LEN] = "tests/objdump_X";
-        obj_dump_file_name[14] =  '0' + i + 1;
-        FILE* obj_dump_file = fopen(obj_dump_file_name, "r");
-        assert(obj_dump_file);
-        fseek(obj_dump_file, 0, SEEK_END);
-        int file_size = ftell(obj_dump_file);
-        rewind(obj_dump_file);
-        char* text = (char*)calloc(file_size, sizeof(char));
-        assert(text);
-        fread(text, sizeof(char), file_size, obj_dump_file);
-        fclose(obj_dump_file);
+    if (text_bufs[0] == NULL) {
+        GtkTextView* text_view = NULL;
+        //                                         01234567
+        //                                         VVVVVVVV
+        char text_view_name[sizeof("Disasm_X")] = "Disasm_X";
+        for (int i = 0; i < 1/*CHIPS_NUM*/; i++) {
+            text_view_name[7] = '1' + i;
+            text_view = (GtkTextView*)gui_find_widget_child(GTK_WIDGET(simulator.window),
+                                                            text_view_name);
+            assert(text_view);
+            text_bufs[i] = gtk_text_view_get_buffer(text_view);
+            assert(text_bufs[i]);
 
-        // Set text
-        (void)gtk_text_buffer_set_text(text_buf, text, file_size);
+        }
+    }
+
+    for (int i = 0; i < 1/*CHIPS_NUM*/; i++) {
+        int PC = simulator.chips[i]->PC;
+        char needle[MAX_STR_LEN] = {0};
+        sprintf(needle, "  %x:", PC * 2);
+        GtkTextIter start, end;
+        (void)gtk_text_buffer_get_start_iter(text_bufs[i], &start);
+        (void)gtk_text_buffer_get_end_iter  (text_bufs[i], &end);
+        gchar* haystack = NULL;
+        haystack = gtk_text_buffer_get_text(text_bufs[i],
+                                            &start,
+                                            &end,
+                                            FALSE);
+        char* needle_in_haystack = strstr(haystack, needle);
+        if (!needle_in_haystack) {
+            free(haystack);
+            continue;
+        }
+        int index = (long long int)needle_in_haystack -
+                    (long long int)haystack;
+        int slash_n_sum = 0;
+        for (int i = 0; i < index; i++) {
+            slash_n_sum += (haystack[i] == '\n');
+        }
+        int end_offset = 0;
+        while (haystack[++end_offset] != '\n')
+            end_offset++;
+        GtkTextIter line_begin_iter, line_end_iter;
+        (void)gtk_text_buffer_get_iter_at_line(text_bufs[i],
+                                               &line_begin_iter,
+                                               slash_n_sum);
+        (void)gtk_text_buffer_get_iter_at_line_offset(text_bufs[i],
+                                                      &line_end_iter,
+                                                      slash_n_sum,
+                                                      end_offset);
+        static GtkTextTag* line_tag = NULL;
+        if (line_tag == NULL) {
+            line_tag = gtk_text_buffer_create_tag(text_bufs[i],
+                                                  NULL, //< Anonymous tag
+                                                  "foreground",
+                                                  "blue",
+                                                  NULL);
+        }
+        (void)gtk_text_buffer_remove_tag(text_bufs[i],
+                                         line_tag, &start, &end);
+        (void)gtk_text_buffer_apply_tag(text_bufs[i],
+                                        line_tag,
+                                        &line_begin_iter,
+                                        &line_end_iter);
+        free(haystack);
     }
 }

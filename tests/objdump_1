@@ -1,0 +1,96 @@
+
+blink:     формат файла elf32-avr
+
+
+Дизассемблирование раздела .text:
+
+00000000 <__vectors>:
+   0:	09 c0       	rjmp	.+18     	; 0x14 <__ctors_end>
+   2:	0e c0       	rjmp	.+28     	; 0x20 <__bad_interrupt>
+   4:	0d c0       	rjmp	.+26     	; 0x20 <__bad_interrupt>
+   6:	0c c0       	rjmp	.+24     	; 0x20 <__bad_interrupt>
+   8:	0b c0       	rjmp	.+22     	; 0x20 <__bad_interrupt>
+   a:	0a c0       	rjmp	.+20     	; 0x20 <__bad_interrupt>
+   c:	09 c0       	rjmp	.+18     	; 0x20 <__bad_interrupt>
+   e:	08 c0       	rjmp	.+16     	; 0x20 <__bad_interrupt>
+  10:	07 c0       	rjmp	.+14     	; 0x20 <__bad_interrupt>
+  12:	06 c0       	rjmp	.+12     	; 0x20 <__bad_interrupt>
+
+00000014 <__ctors_end>:
+  14:	11 24       	eor	r1, r1
+  16:	1f be       	out	0x3f, r1	; 63
+  18:	cf e9       	ldi	r28, 0x9F	; 159
+  1a:	cd bf       	out	0x3d, r28	; 61
+  1c:	02 d0       	rcall	.+4      	; 0x22 <main>
+  1e:	0e c0       	rjmp	.+28     	; 0x3c <_exit>
+
+00000020 <__bad_interrupt>:
+  20:	ef cf       	rjmp	.-34     	; 0x0 <__vectors>
+
+00000022 <main>:
+  22:	8f ef       	ldi	r24, 0xFF	; 255
+  24:	87 bb       	out	0x17, r24	; 23
+  26:	88 bb       	out	0x18, r24	; 24
+  28:	88 bb       	out	0x18, r24	; 24
+  2a:	88 bb       	out	0x18, r24	; 24
+  2c:	88 bb       	out	0x18, r24	; 24
+  2e:	88 bb       	out	0x18, r24	; 24
+  30:	18 ba       	out	0x18, r1	; 24
+  32:	18 ba       	out	0x18, r1	; 24
+  34:	18 ba       	out	0x18, r1	; 24
+  36:	18 ba       	out	0x18, r1	; 24
+  38:	18 ba       	out	0x18, r1	; 24
+  3a:	f5 cf       	rjmp	.-22     	; 0x26 <main+0x4>
+
+0000003c <_exit>:
+  3c:	f8 94       	cli
+
+0000003e <__stop_program>:
+  3e:	ff cf       	rjmp	.-2      	; 0x3e <__stop_program>
+
+Дизассемблирование раздела .comment:
+
+00000000 <.comment>:
+   0:	47 43       	sbci	r20, 0x37	; 55
+   2:	43 3a       	cpi	r20, 0xA3	; 163
+   4:	20 28       	or	r2, r0
+   6:	47 4e       	sbci	r20, 0xE7	; 231
+   8:	55 29       	or	r21, r5
+   a:	20 34       	cpi	r18, 0x40	; 64
+   c:	2e 39       	cpi	r18, 0x9E	; 158
+   e:	2e 32       	cpi	r18, 0x2E	; 46
+	...
+
+Дизассемблирование раздела .note.gnu.avr.deviceinfo:
+
+00000000 <.note.gnu.avr.deviceinfo>:
+   0:	04 00       	.word	0x0004	; ????
+   2:	00 00       	nop
+   4:	2c 00       	.word	0x002c	; ????
+   6:	00 00       	nop
+   8:	01 00       	.word	0x0001	; ????
+   a:	00 00       	nop
+   c:	41 56       	subi	r20, 0x61	; 97
+   e:	52 00       	.word	0x0052	; ????
+  10:	00 00       	nop
+  12:	00 00       	nop
+  14:	00 04       	cpc	r0, r0
+  16:	00 00       	nop
+  18:	60 00       	.word	0x0060	; ????
+  1a:	00 00       	nop
+  1c:	40 00       	.word	0x0040	; ????
+  1e:	00 00       	nop
+  20:	00 00       	nop
+  22:	00 00       	nop
+  24:	40 00       	.word	0x0040	; ????
+  26:	00 00       	nop
+  28:	08 00       	.word	0x0008	; ????
+  2a:	00 00       	nop
+  2c:	01 00       	.word	0x0001	; ????
+  2e:	00 00       	nop
+  30:	00 61       	ori	r16, 0x10	; 16
+  32:	74 74       	andi	r23, 0x44	; 68
+  34:	69 6e       	ori	r22, 0xE9	; 233
+  36:	79 31       	cpi	r23, 0x19	; 25
+  38:	33 61       	ori	r19, 0x13	; 19
+	...

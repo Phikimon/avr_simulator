@@ -628,7 +628,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="disasm_file_set" object="Disasm_1_buf" swapped="no"/>
+                    <signal name="clicked" handler="disasm_file_set" object="Disasm_1" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -644,7 +644,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="disasm_file_set" object="Disasm_2_buf" swapped="no"/>
+                    <signal name="clicked" handler="disasm_file_set" object="Disasm_2" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
