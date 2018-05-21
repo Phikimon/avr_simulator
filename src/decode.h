@@ -224,6 +224,7 @@ do {                                                             \
     INSTRUCTION ( BRID     , ((cmd & 0xFC07) == 0xF407) ,     2    , FILL_ARGS_BRANCH     )
 
     INSTRUCTION ( NOP      , ((cmd & 0xFFFF) == 0x0000) ,     1    , FILL_ARGS_NO_ARGS    )
+    INSTRUCTION ( BREAK    , ((cmd & 0xFFFF) == 0x9598) ,     1    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( RET      , ((cmd & 0xFFFF) == 0x9508) ,     4    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( RETI     , ((cmd & 0xFFFF) == 0x9518) ,     4    , FILL_ARGS_NO_ARGS    )
     INSTRUCTION ( ICALL    , ((cmd & 0xFFFF) == 0x9509) ,     3    , FILL_ARGS_NO_ARGS    )

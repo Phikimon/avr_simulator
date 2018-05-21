@@ -1004,6 +1004,11 @@ DO_FUNC(CLT,
     chip->PC++;
 })
 
+DO_FUNC(BREAK,
+{
+    // There will be something
+})
+
 #undef DO_FUNC
 #undef DO_CONDITIONAL_BRANCH
 #undef SET_FLAG
