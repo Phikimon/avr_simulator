@@ -36,7 +36,7 @@ void launch_threads(int argc, char *argv[])
 {
     pthread_t        gui, chip_pthreads[CHIPS_NUM];
     struct attiny13  chips[CHIPS_NUM] = {0};
-    if (argc != 3) {
+    if (argc < 3) {
         simulator.is_inited = 0;
     } else {
         int ctor_ret1 = attiny13_ctor(&chips[FIRST_CHIP],  argv[1]);
@@ -114,7 +114,7 @@ void simulator_step(long int step_num)
 
         gui_dump_memory();
         gui_dump_registers();
-        gui_obj_dump();
+        gui_obj_dump_update_line();
         step++;
         //dump_pins_states();
     }

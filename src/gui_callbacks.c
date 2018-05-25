@@ -6,6 +6,10 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <gtk/gtk.h>
 #include <cairo.h>
@@ -77,6 +81,7 @@ void on_draw_area_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
 
     cairo_stroke(cr);
     cairo_surface_destroy(s);
+    g_object_unref(pix);
 }
 
 void on_step_pressed(GtkWidget* button, GtkSpinButton* step_num_widget)
@@ -87,6 +92,73 @@ void on_step_pressed(GtkWidget* button, GtkSpinButton* step_num_widget)
         simulator.is_inited = 1;
     }
     simulator_step(step_num);
+}
+
+void disasm_file_set(GtkFileChooserButton* button, GtkTextBuffer* text_buf)
+{
+
+    GtkWidget *dialog;
+    dialog = gtk_file_chooser_dialog_new (gtk_widget_get_name(GTK_WIDGET(button)),
+                                          simulator.window,
+                                          GTK_FILE_CHOOSER_ACTION_OPEN,
+                                          "Cancel",
+                                          GTK_RESPONSE_CANCEL,
+                                          "Open",
+                                          GTK_RESPONSE_ACCEPT,
+                                          NULL);
+
+    gint res = gtk_dialog_run (GTK_DIALOG (dialog));
+    if (res != GTK_RESPONSE_ACCEPT)
+        return;
+    GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
+    char* filename = gtk_file_chooser_get_filename (chooser);
+    assert(filename);
+    gtk_widget_destroy (dialog);
+
+    struct stat buf = {0};
+    int stat_ret, close_ret, fd, bytes_read;
+    char* text;
+
+    stat_ret = stat(filename, &buf);
+    if ((stat_ret == -1) || (buf.st_size < 1)) {
+        perror("stat");
+        goto critical;
+    }
+    fd = open(filename, O_RDONLY);
+    if (stat_ret == -1) {
+        perror("open");
+        goto critical;
+    }
+    text = (char*)calloc(buf.st_size + sizeof((char)'\0'),
+                         sizeof(char));
+    if (!text) {
+        perror("calloc");
+        goto close_fd;
+    }
+    bytes_read = read(fd, text, buf.st_size);
+    if (bytes_read != buf.st_size) {
+        perror("read");
+        goto free_text;
+    }
+    close_ret = close(fd);
+    if (close_ret == -1) {
+        perror("close");
+        free(text);
+        goto critical;
+    }
+    (void)gtk_text_buffer_set_text(text_buf, text, buf.st_size);
+
+    free(text);
+    g_free (filename);
+    return;
+
+free_text:
+    free(text);
+close_fd:
+    close(fd);
+critical:
+    g_free (filename);
+    exit(1);
 }
 
 void on_window_main_destroy(void)
