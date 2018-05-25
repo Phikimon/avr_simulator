@@ -297,3 +297,15 @@ void gui_obj_dump_update_line(void)
         free(haystack);
     }
 }
+
+void gui_increase_global_tick(void)
+{
+    char buf[MAX_STR_LEN] = {0};
+    static GtkLabel* label = NULL;
+    label = GTK_LABEL(gui_find_widget_child(GTK_WIDGET(simulator.window), "TICK"));
+    assert(label);
+
+    static long tick = 0;
+    sprintf(buf, "%d", tick++);
+    (void)gtk_label_set_text(label, buf);
+}

@@ -115,7 +115,7 @@ int decode(struct attiny13* chip, uint16_t cmd)
     if ((check_interrupt(chip) == ERR_INTERRUPT))
         return ERR_SUCCESS;
     acquire_lock();
-    printf("%4X", cmd);
+    //printf("%4X", cmd);
 #define INSTRUCTION(NAME, CONDITION, DURATION, FILL_ARGS)     \
 {                                                             \
     if (CONDITION) {                                          \
@@ -123,7 +123,7 @@ int decode(struct attiny13* chip, uint16_t cmd)
         chip->cmd.progress = 0;                               \
         chip->cmd.duration = DURATION;                        \
         FILL_ARGS;                                            \
-        printf("\t%s\n", #NAME);                              \
+        /*printf("\t%s\n", #NAME);*/                            \
         return ERR_SUCCESS;                                   \
     }                                                         \
 } // Do-while-0 is not used intentionally

@@ -59,7 +59,7 @@ void launch_threads(int argc, char *argv[])
 
     pthread_join(gui, NULL);
     for (int i = 0; i < CHIPS_NUM; i++) {
-        pthread_join(chip_pthreads[0], NULL);
+        pthread_join(chip_pthreads[i], NULL);
     }
 }
 
@@ -99,7 +99,7 @@ void simulator_step(long int step_num)
         return;
     gui_refresh_pins_states();
     for (int i = 0; i < step_num; i++) {
-        printf("\nstep = %d\n", step);
+        gui_increase_global_tick();
         SEM_PUSH(FIRST_CHIP,  +1, 0);
         SEM_PUSH(SECOND_CHIP, +1, 0);
         SEM_FLUSH();
