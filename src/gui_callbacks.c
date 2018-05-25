@@ -81,6 +81,7 @@ void on_draw_area_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
 
     cairo_stroke(cr);
     cairo_surface_destroy(s);
+    g_object_unref(pix);
 }
 
 void on_step_pressed(GtkWidget* button, GtkSpinButton* step_num_widget)

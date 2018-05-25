@@ -233,7 +233,7 @@ void gui_obj_dump_update_line(void)
         //                                         01234567
         //                                         VVVVVVVV
         char text_view_name[sizeof("Disasm_X")] = "Disasm_X";
-        for (int i = 0; i < 1/*CHIPS_NUM*/; i++) {
+        for (int i = 0; i < CHIPS_NUM; i++) {
             text_view_name[7] = '1' + i;
             text_view = (GtkTextView*)gui_find_widget_child(GTK_WIDGET(simulator.window),
                                                             text_view_name);
@@ -244,7 +244,7 @@ void gui_obj_dump_update_line(void)
         }
     }
 
-    for (int i = 0; i < 1/*CHIPS_NUM*/; i++) {
+    for (int i = 0; i < CHIPS_NUM; i++) {
         int PC = simulator.chips[i]->PC;
         char needle[MAX_STR_LEN] = {0};
         sprintf(needle, "  %x:", PC * 2);
@@ -267,9 +267,10 @@ void gui_obj_dump_update_line(void)
         for (int i = 0; i < index; i++) {
             slash_n_sum += (haystack[i] == '\n');
         }
-        int end_offset = 0;
-        while (haystack[++end_offset] != '\n')
-            end_offset++;
+        index++;
+        while (haystack[index] != '\n') {
+            index++;
+        }
         GtkTextIter line_begin_iter, line_end_iter;
         (void)gtk_text_buffer_get_iter_at_line(text_bufs[i],
                                                &line_begin_iter,
@@ -277,19 +278,20 @@ void gui_obj_dump_update_line(void)
         (void)gtk_text_buffer_get_iter_at_line_offset(text_bufs[i],
                                                       &line_end_iter,
                                                       slash_n_sum,
-                                                      end_offset);
-        static GtkTextTag* line_tag = NULL;
-        if (line_tag == NULL) {
-            line_tag = gtk_text_buffer_create_tag(text_bufs[i],
-                                                  NULL, //< Anonymous tag
-                                                  "foreground",
-                                                  "blue",
-                                                  NULL);
+                                                      index);
+        GtkTextTag* line_tag[2] = {NULL};
+        if (line_tag[i] == NULL) {
+            line_tag[i] = gtk_text_buffer_create_tag(text_bufs[i],
+                                                     NULL, //< Anonymous
+                                                     "foreground",
+                                                     "white",
+                                                     "background",
+                                                     "black",
+                                                     NULL);
         }
-        (void)gtk_text_buffer_remove_tag(text_bufs[i],
-                                         line_tag, &start, &end);
+        (void)gtk_text_buffer_remove_all_tags(text_bufs[i], &start, &end);
         (void)gtk_text_buffer_apply_tag(text_bufs[i],
-                                        line_tag,
+                                        line_tag[i],
                                         &line_begin_iter,
                                         &line_end_iter);
         free(haystack);
