@@ -1,3 +1,5 @@
+![Screenshot](https://github.com/phikimon/avr_simulator/raw/master/resources/interface_screenshot.png)
+
 ### Graphical avr simulator
 
 Unfinished and as for now very unstable graphical parallel simulator
@@ -22,5 +24,3 @@ $ sudo apt install libgtk-3-dev ctags gtkwave
 ```sh
 $ ./main
 ```
-
-![Screenshot](https://github.com/phikimon/avr_simulator/raw/master/resources/interface_screenshot.png)
