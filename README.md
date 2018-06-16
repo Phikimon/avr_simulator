@@ -23,4 +23,4 @@ $ sudo apt install libgtk-3-dev ctags gtkwave
 $ ./main
 ```
 
-[Screenshot](https://github.com/phikimon/avr-simulator/raw/master/resources/interface_screenshot.png)
+![Screenshot](https://github.com/phikimon/avr_simulator/raw/master/resources/interface_screenshot.png)
